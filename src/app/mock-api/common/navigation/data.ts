@@ -37,6 +37,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:currency-dollar',
                 link : '/dashboards/crypto',
             },
+            {
+                id   : 'dashboards.academy',
+                title: 'Exams',
+                type : 'basic',
+                icon : 'heroicons_outline:academic-cap',
+                link : '/apps/exams',
+            },
         ],
     },
     {

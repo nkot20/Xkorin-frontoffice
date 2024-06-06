@@ -1,6 +1,6 @@
 <div class="flex flex-col flex-auto items-center sm:justify-center min-w-0 md:p-8">
     <div class="flex md:w-full md:max-w-6xl sm:rounded-2xl sm:shadow overflow-hidden sm:bg-card">
-        <div class="relative hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden bg-gray-800 dark:border-r">
+        <div class="relative bg-blue-950 hidden md:flex flex-auto items-center justify-center h-full p-16 lg:px-28 overflow-hidden  dark:border-r">
             <!-- Background - @formatter:off -->
             <!-- Rings -->
             <svg class="absolute inset-0 pointer-events-none"
@@ -62,8 +62,8 @@
                 <div class="flex items-baseline mt-0.5 font-medium">
                     <div>Don't have an account?</div>
                     <a
-                        class="ml-1 text-primary-500 hover:underline"
-                        [routerLink]="['/sign-up']">Sign up
+                        class="ml-1 text-blue-800 hover:underline"
+                        [routerLink]="['/choose-profil']">Sign up
                     </a>
                 </div>
 
@@ -136,14 +136,14 @@
                             Remember me
                         </mat-checkbox>
                         <a
-                            class="text-md font-medium text-primary-500 hover:underline"
+                            class="text-md font-medium hover:underline text-blue-800"
                             [routerLink]="['/forgot-password']">Forgot password?
                         </a>
                     </div>
 
                     <!-- Submit button -->
                     <button
-                        class="fuse-mat-button-large w-full mt-6"
+                        class="fuse-mat-button-large w-full mt-6 bg-blue-800"
                         mat-flat-button
                         [color]="'primary'"
                         [disabled]="signInForm.disabled"
