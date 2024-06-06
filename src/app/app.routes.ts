@@ -74,6 +74,7 @@ export const appRoutes: Route[] = [
         },
         children: [
             {path: 'home', loadChildren: () => import('app/modules/landing/home/home.routes')},
+            {path: 'choose-profil', loadChildren: ()=> import('app/modules/landing/choose-profil/choose-profil.routes')},
         ]
     },
 
