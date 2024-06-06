@@ -1,0 +1,29 @@
+.radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.radio-group div {
+    width: 48%;
+    margin-bottom: 10px;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group label {
+    display: block;
+    padding: 10px;
+    border: 1px solid #d1d1d1;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.radio-group input[type="radio"]:checked + label {
+    background-color: #e0f7ff;
+    border-color: #3b82f6;
+}
