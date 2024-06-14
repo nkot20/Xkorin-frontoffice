@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 @Injectable({providedIn: 'root'})
 export class AuthService
@@ -47,7 +48,7 @@ export class AuthService
      */
     forgotPassword(email: string): Observable<any>
     {
-        return this._httpClient.post('api/auth/forgot-password', email);
+        return this._httpClient.post(environment.apiAuth + 'auth/forgot-password', email);
     }
 
     /**
@@ -57,7 +58,7 @@ export class AuthService
      */
     resetPassword(password: string): Observable<any>
     {
-        return this._httpClient.post('api/auth/reset-password', password);
+        return this._httpClient.post(environment.apiAuth + 'auth/reset-password', password);
     }
 
     /**
@@ -73,7 +74,7 @@ export class AuthService
             return throwError('User is already logged in.');
         }
 
-        return this._httpClient.post('api/auth/sign-in', credentials).pipe(
+        return this._httpClient.post(environment.apiAuth + 'auth/sign-in', credentials).pipe(
             switchMap((response: any) =>
             {
                 // Store the access token in the local storage
@@ -97,7 +98,7 @@ export class AuthService
     signInUsingToken(): Observable<any>
     {
         // Sign in using the token
-        return this._httpClient.post('api/auth/sign-in-with-token', {
+        return this._httpClient.post(environment.apiAuth + 'auth/sign-in-with-token', {
             accessToken: this.accessToken,
         }).pipe(
             catchError(() =>
@@ -151,9 +152,20 @@ export class AuthService
      *
      * @param user
      */
-    signUp(user: { name: string; email: string; password: string; company: string }): Observable<any>
+    signUp(user: { name: string; email: string; password: string; company: string, profil: string, subcategory: string, agreements: boolean }): Observable<any>
     {
-        return this._httpClient.post('api/auth/sign-up', user);
+        return this._httpClient.post(environment.apiAuth + 'auth/sign-up', user);
+    }
+
+    /**
+     * Sign up
+     *
+     * @param token
+     */
+    confirmEmail(token): Observable<any>
+    {
+        console.log(token)
+        return this._httpClient.post(environment.apiAuth + 'auth/confirm-email', {token});
     }
 
     /**
@@ -192,4 +204,6 @@ export class AuthService
         // If the access token exists, and it didn't expire, sign in using it
         return this.signInUsingToken();
     }
+
+
 }

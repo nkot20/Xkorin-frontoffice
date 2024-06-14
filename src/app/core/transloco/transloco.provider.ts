@@ -16,6 +16,10 @@ export const provideTransloco = (): Array<Provider | EnvironmentProviders> =>
                         label: 'English',
                     },
                     {
+                        id   : 'fr',
+                        label: 'French',
+                    },
+                    {
                         id   : 'tr',
                         label: 'Turkish',
                     },

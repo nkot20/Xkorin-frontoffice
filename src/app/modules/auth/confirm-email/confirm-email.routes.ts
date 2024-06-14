@@ -1,18 +1,19 @@
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, Routes} from '@angular/router';
-import { LandingHomeComponent } from 'app/modules/landing/home/home.component';
-import {ChooseProfilComponent} from "./choose-profil.component";
+import { AuthConfirmationRequiredComponent } from 'app/modules/auth/confirmation-required/confirmation-required.component';
+import {ConfirmEmailComponent} from "./confirm-email.component";
 import {inject} from "@angular/core";
-import {CategoryService} from "../../../core/category/category.service";
+import {ProfilService} from "../../../core/profil/profil.service";
 import {TranslocoService} from "@ngneat/transloco";
 import {catchError, throwError} from "rxjs";
+import {AuthService} from "../../../core/auth/auth.service";
 
-const categoryResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
-    const categoryService = inject(CategoryService);
-    const translocoService = inject(TranslocoService)
+
+const confirmEmailResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
+    const authService = inject(AuthService);
+    const token  = route.paramMap.get('token');
     const router = inject(Router);
-    const lang = translocoService.getActiveLang()
 
-    return categoryService.getCategoriesByLanguage(lang).pipe(
+    return authService.confirmEmail(token).pipe(
         // Error here means the requested category is not available
         catchError((error) => {
             // Log the error
@@ -28,15 +29,15 @@ const categoryResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
             return throwError(error);
         }),
     );
-};
 
+};
 
 export default [
     {
         path     : '',
-        component: ChooseProfilComponent,
+        component: ConfirmEmailComponent,
         resolve: {
-            categories: categoryResolver
+            confirmation: confirmEmailResolver,
         }
     },
 ] as Routes;

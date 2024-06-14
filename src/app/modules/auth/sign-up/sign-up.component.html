@@ -138,6 +138,18 @@
                         </mat-error>
                     </mat-form-field>
 
+                    <!-- profil field -->
+                    <mat-form-field class="w-full" *ngIf="(profils$ | async) as profils">
+                        <mat-label>Profil</mat-label>
+                        <mat-select [formControlName]="'profil'">
+                            <mat-option *ngFor="let profil of profils" value="{{profil._id}}">{{profil.label}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="signUpForm.get('profil').hasError('required')">
+                            Profil is required
+                        </mat-error>
+                    </mat-form-field>
+
+
                     <!-- Company field -->
                     <mat-form-field class="w-full">
                         <mat-label>Company</mat-label>
@@ -145,6 +157,17 @@
                             id="company-confirm"
                             matInput
                             [formControlName]="'company'">
+                    </mat-form-field>
+
+                    <!-- Subcategory field -->
+                    <mat-form-field class="w-full" *ngIf="(subCategories$ | async) as subCategories">
+                        <mat-label>Company status</mat-label>
+                        <mat-select [formControlName]="'subcategory'">
+                            <mat-option *ngFor="let subCategory of subCategories" value="{{subCategory._id}}">{{subCategory.label}}</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="signUpForm.get('subcategory').hasError('required')">
+                            Company status is required
+                        </mat-error>
                     </mat-form-field>
 
                     <!-- ToS and PP -->

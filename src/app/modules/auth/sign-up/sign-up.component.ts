@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,12 @@ import { Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
+import {MatSelectModule} from "@angular/material/select";
+import {SubCategory} from "../../../core/subCategory/sub-category.types";
+import {Observable} from "rxjs";
+import {SubCategoryService} from "../../../core/subCategory/sub-category.service";
+import {Profil} from "../../../core/profil/profil.types";
+import {ProfilService} from "../../../core/profil/profil.service";
 
 @Component({
     selector     : 'auth-sign-up',
@@ -18,7 +24,7 @@ import { AuthService } from 'app/core/auth/auth.service';
     encapsulation: ViewEncapsulation.None,
     animations   : fuseAnimations,
     standalone   : true,
-    imports      : [RouterLink, NgIf, FuseAlertComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressSpinnerModule],
+    imports: [RouterLink, NgIf, NgForOf, FuseAlertComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatCheckboxModule, MatProgressSpinnerModule, MatSelectModule, AsyncPipe],
 })
 export class AuthSignUpComponent implements OnInit
 {
@@ -30,12 +36,16 @@ export class AuthSignUpComponent implements OnInit
     };
     signUpForm: UntypedFormGroup;
     showAlert: boolean = false;
+    subCategories$: Observable<SubCategory[]>;
+    profils$: Observable<Profil[]>;
 
     /**
      * Constructor
      */
     constructor(
         private _authService: AuthService,
+        private _subCategoryService: SubCategoryService,
+        private _profilService: ProfilService,
         private _formBuilder: UntypedFormBuilder,
         private _router: Router,
     )
@@ -51,13 +61,18 @@ export class AuthSignUpComponent implements OnInit
      */
     ngOnInit(): void
     {
+        this.subCategories$ = this._subCategoryService.subCategories$;
+        this.profils$ = this._profilService.profils$;
+
         // Create the form
         this.signUpForm = this._formBuilder.group({
-                name      : ['', Validators.required],
-                email     : ['', [Validators.required, Validators.email]],
-                password  : ['', Validators.required],
-                company   : [''],
-                agreements: ['', Validators.requiredTrue],
+                name        : ['', Validators.required],
+                email       : ['', [Validators.required, Validators.email]],
+                password    : ['', Validators.required],
+                company     : ['', Validators.required],
+                subcategory : ['', Validators.required],
+                profil      : ['', Validators.required],
+                agreements  : ['', Validators.requiredTrue],
             },
         );
     }

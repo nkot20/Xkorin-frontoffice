@@ -1,3 +1,6 @@
+import {Company} from "../company/company.types";
+import {Person} from "../person/person.types";
+
 export interface User
 {
     id: string;
@@ -5,4 +8,7 @@ export interface User
     email: string;
     avatar?: string;
     status?: string;
+    role?: number[];
+    company?: Company;
+    person?: Person;
 }

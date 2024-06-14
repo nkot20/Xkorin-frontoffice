@@ -9,8 +9,8 @@ import { LayoutComponent } from 'app/layout/layout.component';
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const appRoutes: Route[] = [
 
-    // Redirect empty path to '/dashboards/project'
-    {path: '', pathMatch : 'full', redirectTo: 'dashboards/project'},
+    // Redirect empty path to '/home'
+    {path: '', pathMatch : 'full', redirectTo: 'home'},
 
     // Redirect signed-in user to the '/dashboards/project'
     //
@@ -46,7 +46,8 @@ export const appRoutes: Route[] = [
             {path: 'forgot-password', loadChildren: () => import('app/modules/auth/forgot-password/forgot-password.routes')},
             {path: 'reset-password', loadChildren: () => import('app/modules/auth/reset-password/reset-password.routes')},
             {path: 'sign-in', loadChildren: () => import('app/modules/auth/sign-in/sign-in.routes')},
-            {path: 'sign-up', loadChildren: () => import('app/modules/auth/sign-up/sign-up.routes')}
+            {path: 'sign-up', loadChildren: () => import('app/modules/auth/sign-up/sign-up.routes')},
+            {path: 'confirm-email/:token', loadChildren: () => import('app/modules/auth/confirm-email/confirm-email.routes')},
         ]
     },
 
