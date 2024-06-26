@@ -1,14 +1,14 @@
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { NgFor, NgIf } from '@angular/common';
+import {DatePipe, NgFor, NgIf} from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import { Board } from 'app/modules/admin/apps/scrumboard/scrumboard.models';
 import { ScrumboardService } from 'app/modules/admin/apps/scrumboard/scrumboard.service';
 import { DateTime } from 'luxon';
 import { Subject, takeUntil } from 'rxjs';
-import {Exam} from "../exam.models";
-import {ExamService} from "../exam.service";
+import {ExamService} from "../../../../../core/exam/exam.service";
+import {Exam} from "../../../../../core/exam/exam.types";
 
 @Component({
     selector       : 'scrumboard-boards',
@@ -16,7 +16,7 @@ import {ExamService} from "../exam.service";
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [CdkScrollable, NgFor, RouterLink, MatIconModule, NgIf],
+    imports: [CdkScrollable, NgFor, RouterLink, MatIconModule, NgIf, DatePipe],
 })
 export class ExamsComponent implements OnInit, OnDestroy
 {
@@ -24,6 +24,7 @@ export class ExamsComponent implements OnInit, OnDestroy
 
     // Private
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    isAvailable: Boolean = true;
 
     /**
      * Constructor
@@ -31,6 +32,7 @@ export class ExamsComponent implements OnInit, OnDestroy
     constructor(
         private _changeDetectorRef: ChangeDetectorRef,
         private _examService: ExamService,
+        private router: Router,
     )
     {
     }
@@ -50,10 +52,12 @@ export class ExamsComponent implements OnInit, OnDestroy
             .subscribe((exams: Exam[]) =>
             {
                 this.exams = exams;
-
+                this.isAvailable = this._examService.indiceAvailable$;
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
             });
+
+        console.log(this.isAvailable)
     }
 
     /**
@@ -89,5 +93,9 @@ export class ExamsComponent implements OnInit, OnDestroy
     trackByFn(index: number, item: any): any
     {
         return item.id || index;
+    }
+
+    onGoToNewExam() {
+        this.router.navigate(['/evaluation/new'])
     }
 }

@@ -1,0 +1,46 @@
+.survey-table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+table {
+    width: 100%;
+}
+
+th.mat-header-cell {
+    text-align: center;
+}
+
+td.mat-cell {
+    text-align: center;
+}
+
+mat-radio-group {
+    display: flex;
+    justify-content: center;
+}
+
+mat-radio-button {
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    font-weight: bold;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+}
