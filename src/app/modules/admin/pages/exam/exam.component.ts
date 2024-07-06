@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from "@angular/router";
+import {ExamService} from "../../../../core/exam/exam.service";
+import {Observable} from "rxjs";
+import {Exam} from "../../../../core/exam/exam.types";
 
 @Component({
   selector: 'app-exam',
@@ -9,5 +12,10 @@ import {RouterOutlet} from "@angular/router";
     imports: [RouterOutlet]
 })
 export class ExamComponent {
+
+
+    constructor() {
+    }
+
 
 }

@@ -21,15 +21,15 @@ export const appRoutes: Route[] = [
 
     // Auth routes for guests
     {
-        path: 'entity',
-        canActivate: [NoAuthGuard],
-        canActivateChild: [NoAuthGuard],
+        path: 'evaluation',
+        canActivate: [AuthGuard],
+        canActivateChild: [AuthGuard],
         component: LayoutComponent,
         data: {
             layout: 'empty'
         },
         children: [
-            {path: 'exam', loadChildren: () => import('app/modules/entity/exam/exam.routes')},
+            {path: 'new', loadChildren: () => import('app/modules/entity/exam/exam.routes')},
         ]
     },
 

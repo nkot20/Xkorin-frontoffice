@@ -6,37 +6,53 @@
     <div class="flex flex-col flex-auto items-center p-6 sm:p-10">
 
         <!-- Title -->
-        <div class="mt-4 md:mt-24 text-3xl md:text-6xl font-extrabold tracking-tight leading-7 sm:leading-10">
-            Exams
+        <div class="mt-2 md:mt-12 text-3xl md:text-6xl font-extrabold tracking-tight leading-7 sm:leading-10">
+            My Assessments
         </div>
 
         <!-- Boards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 md:mt-16">
+            <div class="flex flex-col items-center justify-center w-56 rounded-lg cursor-pointer border-2 border-gray-300 border-dashed hover:bg-hover transition-colors duration-150 ease-in-out" (click)="onGoToNewExam()">
+                <mat-icon
+                    class="icon-size-12 text-hint"
+                    [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+            </div>
             <ng-container *ngFor="let exam of exams; trackBy: trackByFn">
                 <a
-                    class="flex flex-col items-start w-56 p-6 rounded-lg shadow bg-card rounded-lg hover:shadow-xl transition-shadow duration-150 ease-in-out"
-                    [routerLink]="[exam.id]">
+                    class="flex flex-col items-start w-70 p-6 rounded-lg shadow bg-card rounded-lg hover:shadow-xl transition-shadow duration-150 ease-in-out"
+                    [routerLink]="['details/' + exam.exam._id]">
                     <div class="flex items-center justify-center p-4 rounded-full bg-primary-50 text-primary-700 dark:bg-primary dark:text-on-primary">
                         <mat-icon
                             class="text-current"
                             svgIcon="heroicons_outline:academic-cap"></mat-icon>
                     </div>
-                    <!-- Title -->
-                    <div class="mt-5 text-lg font-medium leading-5">{{exam.reason}}</div>
-
                     <!-- Last activity -->
                     <div class="flex items-center mt-4 text-md font-md">
-                        <div class="text-secondary">Passed:</div>
-                        <div class="ml-1">{{exam.date}}</div>
+                        <div class="text-secondary">Date: </div>
+                        <div class="ml-1">{{exam.exam.createdAt | date:'short'}}</div>
+                    </div>
+                    <!-- Title -->
+                    <div class="mt-5 text-lg font-medium leading-5">{{exam.exam.aim}}</div>
+
+
+                    <div class="flex items-center mt-4 text-md font-md">
+                        <div class="text-secondary">Score: </div>
+                        <div class="ml-1">895</div>
+                    </div>
+                    <div class="flex items-center mt-4 text-md font-md">
+                        <div class="text-secondary">Confidence index: </div>
+                        <div class="ml-1" *ngIf="exam.indiceAvailable">Available</div>
+                        <div class="ml-1" *ngIf="!exam.indiceAvailable">Not completed</div>
+                    </div>
+                    <div class="flex items-center mt-4 text-md font-md">
+                        <div class="text-secondary">Audited: </div>
+                        <div class="ml-1" *ngIf="exam.exam.audited">Yes</div>
+                        <div class="ml-1" *ngIf="!exam.exam.audited">No</div>
                     </div>
                 </a>
             </ng-container>
             <!-- New board -->
-            <div class="flex flex-col items-center justify-center w-56 rounded-lg cursor-pointer border-2 border-gray-300 border-dashed hover:bg-hover transition-colors duration-150 ease-in-out">
-                <mat-icon
-                    class="icon-size-12 text-hint"
-                    [svgIcon]="'heroicons_outline:plus'"></mat-icon>
-            </div>
+
         </div>
 
     </div>
