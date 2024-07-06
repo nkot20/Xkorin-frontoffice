@@ -11,8 +11,9 @@ import {environment} from "../../../environments/environment";
 export class ExamService {
     pathExam = '/exam'
 
-    private _exams: ReplaySubject<Exam[]> = new ReplaySubject<Exam[]>();
+        private _exams: ReplaySubject<any[]> = new ReplaySubject<any[]>();
     private _exam: ReplaySubject<Exam> = new ReplaySubject<Exam>();
+    private _examDetails: ReplaySubject<any> = new ReplaySubject<any>();
     private _indiceAvailable: Boolean;
     constructor(private _httpClient: HttpClient) { }
 
@@ -22,7 +23,10 @@ export class ExamService {
     get exam$(): Observable<Exam> {
         return this._exam.asObservable();
     }
-    get exams$(): Observable<Exam[]> {
+    get examDetails$(): Observable<any> {
+        return this._examDetails.asObservable();
+    }
+    get exams$(): Observable<any[]> {
         return this._exams.asObservable();
     }
 
@@ -31,22 +35,26 @@ export class ExamService {
     }
 
     createExam(exam) : Observable<any> {
-        return this._httpClient.post<Exam>(environment.api + this.pathExam + '/create', exam).pipe(
-            map((response) => {
-                this.exam = response;
-            }),
-        )
+        return this._httpClient.post<Exam>(environment.api + this.pathExam + '/create', exam);
     }
 
-    getPersonExam(personId): Observable<Exam[]> {
+    getPersonExam(personId): Observable<any[]> {
         return this._httpClient.get<any>(environment.api + this.pathExam  + '/' + personId).pipe(
             tap((response) => {
-                this._exams.next(response.exams);
-                this._indiceAvailable = response.indiceAvailable
-                console.log(this._indiceAvailable)
+                this._exams.next(response);
             })
         )
     }
+
+    getExamById(examId): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.pathExam  + '/details/' + examId).pipe(
+            tap((response) => {
+                this._examDetails.next(response);
+
+            })
+        )
+    }
+
 
 
 }

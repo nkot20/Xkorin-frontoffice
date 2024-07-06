@@ -14,7 +14,7 @@ import {Institution} from "../../../core/institution/institution.type";
 import {InstitutionService} from "../../../core/institution/institution.service";
 import {FuseAlertComponent, FuseAlertType} from "../../../../@fuse/components/alert";
 import {ExamService} from "../../../core/exam/exam.service";
-import {Router} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @Component({
@@ -33,7 +33,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
         MatInputModule,
         ReactiveFormsModule,
         FuseAlertComponent,
-        MatProgressSpinnerModule
+        MatProgressSpinnerModule,
+        RouterLink
     ]
 })
 export class ExamComponent implements OnInit {
@@ -109,9 +110,11 @@ export class ExamComponent implements OnInit {
             .subscribe(
                 (response) =>
                 {
+                    console.log(response)
                     // Navigate to the confirmation required page
-                    //this._router.navigateByUrl('/confirmation-required');
+                    localStorage.setItem('exam', response._id);
                     this.submit = false;
+                    this._router.navigate(['/evaluation/new/imprint']);
                 },
                 (response) =>
                 {

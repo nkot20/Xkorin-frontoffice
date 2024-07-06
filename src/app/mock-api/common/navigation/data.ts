@@ -39,7 +39,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
             },
             {
                 id   : 'dashboards.academy',
-                title: 'Exams',
+                title: 'Assessments',
                 type : 'basic',
                 icon : 'heroicons_outline:academic-cap',
                 link : '/apps/exams',

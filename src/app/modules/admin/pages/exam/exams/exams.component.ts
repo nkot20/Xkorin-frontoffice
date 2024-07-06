@@ -20,7 +20,7 @@ import {Exam} from "../../../../../core/exam/exam.types";
 })
 export class ExamsComponent implements OnInit, OnDestroy
 {
-    exams: Exam[];
+    exams: any[];
 
     // Private
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -49,7 +49,7 @@ export class ExamsComponent implements OnInit, OnDestroy
         // Get the boards
         this._examService.exams$
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((exams: Exam[]) =>
+            .subscribe((exams: any[]) =>
             {
                 this.exams = exams;
                 this.isAvailable = this._examService.indiceAvailable$;

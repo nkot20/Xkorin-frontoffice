@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {ImprintService} from "../../../../core/imprint/imprint.service";
 import {UserService} from "../../../../core/user/user.service";
 import {InstitutionService} from "../../../../core/institution/institution.service";
 import {UntypedFormBuilder} from "@angular/forms";
 import {ExamService} from "../../../../core/exam/exam.service";
 import {OptionService} from "../../../../core/option/option.service";
-import {Router} from "@angular/router";
-import {Observable} from "rxjs";
+import {ActivatedRouteSnapshot, Router, RouterLink, RouterStateSnapshot} from "@angular/router";
+import {Observable, switchMap} from "rxjs";
 import {User} from "../../../../core/user/user.types";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {FuseAlertComponent} from "../../../../../@fuse/components/alert";
@@ -16,6 +16,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatRadioModule} from "@angular/material/radio";
 import {MatTableModule} from "@angular/material/table";
 import {ImprintComponent} from "../imprint/imprint.component";
+import {StateService} from "../state.service";
 
 @Component({
     selector: 'app-main-imprint',
@@ -32,10 +33,11 @@ import {ImprintComponent} from "../imprint/imprint.component";
         MatTableModule,
         NgForOf,
         NgIf,
-        ImprintComponent
+        ImprintComponent,
+        RouterLink
     ]
 })
-export class MainImprintComponent implements OnInit{
+export class MainImprintComponent implements OnInit, OnChanges{
 
     data: any;
     imprints$: Observable<any[]>;
@@ -44,6 +46,9 @@ export class MainImprintComponent implements OnInit{
     user$: Observable<User>;
     variableAlreadyReaded: any[] = [];
     currentVariable: any;
+    currentImprintIndex$: Observable<number>;
+    currentVariableIndex$: Observable<number>;
+
 
     constructor(
         private _userService: UserService,
@@ -52,51 +57,46 @@ export class MainImprintComponent implements OnInit{
         private _formBuilder: UntypedFormBuilder,
         private _examService: ExamService,
         private _optionService: OptionService,
-        private _router: Router
+        private _router: Router,
+        private _stateService: StateService,
+        private router: Router,
     ) {
+        this.currentImprintIndex$ = this._stateService.currentImprintIndex$;
+        this.currentVariableIndex$ = this._stateService.currentVariableIndex$;
+
     }
 
     ngOnInit() {
-
+        if (!localStorage.getItem('exam')) {
+            this.router.navigate(['/evaluation/new']);
+        }
         this._imprintService.imprints$.subscribe(value => {
+            console.log(value)
+            this.data = [value.reverse()[0]];
+            this._stateService.setData(this.data);
 
-            this.data = [(value.reverse())[0]];
-            this.variableAlreadyReaded.push(this.data[this.currentImprintIndex].variables[this.currentVariableIndex])
-            this.currentVariable = this.data[this.currentImprintIndex].variables[this.currentVariableIndex]
+            // Mettre à jour les variables déjà lues et la variable courante
+            this.updateCurrentState();
         });
+
         this.imprints$ = this._imprintService.imprints$;
         this.user$ = this._userService.user$;
     }
 
+    ngOnChanges(changes: SimpleChanges) {
 
-
-    nextVariable() {
-        this.variableAlreadyReaded = [];
-        if (this.currentVariableIndex < this.data[this.currentImprintIndex].variables.length - 1) {
-            this.currentVariableIndex++;
-            for (let i = 0; i <= this.currentVariableIndex; i++) {
-                this.variableAlreadyReaded.push(this.data[this.currentImprintIndex].variables[i])
-            }
-
-        } else {
-            this.nextImprint();
-        }
-        this.currentVariable = this.data[this.currentImprintIndex].variables[this.currentVariableIndex]
     }
 
-    nextImprint() {
-        if (this.currentImprintIndex < this.data.length - 1) {
-            this.currentImprintIndex++;
-            this.currentVariableIndex = 0;
-        }
+    updateCurrentState() {
+        this._stateService.currentVariableIndex$.subscribe(index => {
+            this._stateService.currentImprintIndex$.subscribe(indexImprint => {
+                console.log(index)
+                this.variableAlreadyReaded = this._stateService.getData()[indexImprint].variables.slice(0, this._stateService.currentVariableIndexSource$.value + 1);
+                this.currentVariable = this._stateService.getData()[indexImprint].variables[this._stateService.currentVariableIndexSource$.value];
+            })
+        });
     }
 
-    isLastVariable(): boolean {
-        return this.currentVariableIndex === this.data[this.currentImprintIndex].variables.length - 1;
-    }
 
-    isLastImprint(): boolean {
-        return this.currentImprintIndex === this.data.length - 1;
-    }
 
 }

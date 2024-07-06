@@ -8,4 +8,6 @@ export interface Exam {
     amount: number,
     createdAt?: Date,
     audited: boolean,
+    completed?: boolean,
+
 }

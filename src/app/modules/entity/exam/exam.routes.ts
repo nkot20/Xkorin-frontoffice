@@ -10,16 +10,19 @@ import {InstitutionService} from "../../../core/institution/institution.service"
 import {ImprintComponent} from "./imprint/imprint.component";
 import {OptionService} from "../../../core/option/option.service";
 import {MainImprintComponent} from "./main-imprint/main-imprint.component";
+import {ExamService} from "../../../core/exam/exam.service";
 
 
 const imprintsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const imprintService = inject(ImprintService);
     const userService = inject(UserService);
     const router = inject(Router);
-    const translocoService = inject(TranslocoService)
-    const lang = translocoService.getActiveLang()
+    const translocoService = inject(TranslocoService);
+    const lang = translocoService.getActiveLang();
+    const examService = inject(ExamService);
 
     return userService.user$.subscribe(user => {
+
          return imprintService.getImprintsWithVariables(user.person.profil_id[0], user.person.subcategory_id[0], lang).pipe(
             // Error here means the requested category is not available
             catchError((error) => {

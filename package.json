@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "@angular/animations": "16.0.3",
-        "@angular/cdk": "16.0.2",
+        "@angular/cdk": "^16.0.2",
         "@angular/common": "16.0.3",
         "@angular/compiler": "16.0.3",
         "@angular/core": "16.0.3",
@@ -26,6 +26,7 @@
         "@angular/router": "16.0.3",
         "@ngneat/transloco": "4.2.7",
         "apexcharts": "3.40.0",
+        "chart.js": "^4.4.3",
         "crypto-js": "3.3.0",
         "highlight.js": "11.8.0",
         "lodash-es": "4.17.21",
