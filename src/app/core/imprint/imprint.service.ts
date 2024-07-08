@@ -40,7 +40,7 @@ export class ImprintService {
     getImprintsWithVariables(profilId, subcategoryId, isoCode): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/variable-questions/' + profilId + '/' +subcategoryId + '/' + isoCode).pipe(
             tap((response: any) => {
-
+                console.log(response)
                 this._imprints.next(response);
             }),
         );
@@ -48,8 +48,13 @@ export class ImprintService {
 
     getImprintsByExam(examId): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/dashboard/' + examId).pipe(
-            tap((response: any) => {
-
+            tap((response: any[]) => {
+                response = response.sort((a, b) => {
+                    if (a.imprint.number > b.imprint.number)
+                        return 1;
+                    else
+                        return -1;
+                });
                 this._imprints.next(response);
             }),
         );

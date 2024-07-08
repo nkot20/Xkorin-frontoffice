@@ -9,9 +9,11 @@ import {environment} from "../../../environments/environment";
   providedIn: 'root'
 })
 export class ExamService {
-    pathExam = '/exam'
 
-        private _exams: ReplaySubject<any[]> = new ReplaySubject<any[]>();
+    pathExam = '/exam'
+    private _idExam: string;
+
+    private _exams: ReplaySubject<any[]> = new ReplaySubject<any[]>();
     private _exam: ReplaySubject<Exam> = new ReplaySubject<Exam>();
     private _examDetails: ReplaySubject<any> = new ReplaySubject<any>();
     private _indiceAvailable: Boolean;
@@ -34,6 +36,13 @@ export class ExamService {
         return this._indiceAvailable;
     }
 
+    get idExam(): string {
+        return this._idExam;
+    }
+
+    set idExam(value: string) {
+        this._idExam = value;
+    }
     createExam(exam) : Observable<any> {
         return this._httpClient.post<Exam>(environment.api + this.pathExam + '/create', exam);
     }
@@ -47,6 +56,7 @@ export class ExamService {
     }
 
     getExamById(examId): Observable<any> {
+        this.idExam = examId;
         return this._httpClient.get<any>(environment.api + this.pathExam  + '/details/' + examId).pipe(
             tap((response) => {
                 this._examDetails.next(response);

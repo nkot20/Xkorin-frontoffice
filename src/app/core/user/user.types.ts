@@ -11,4 +11,5 @@ export interface User
     role?: number[];
     company?: Company;
     person?: Person;
+    langage?: string;
 }

@@ -12,6 +12,8 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {Observable} from "rxjs";
 import {ImprintService} from "../../../../../core/imprint/imprint.service";
 import {ExamService} from "../../../../../core/exam/exam.service";
+import {environment} from "../../../../../../environments/environment";
+import {ActivatedRouteSnapshot} from "@angular/router";
 
 Chart.register(...registerables);
 
@@ -53,11 +55,14 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
 
 
     progress = 80;
+    urlCertificat: string = environment.apiFile+'/certificats/imprints-fusion/';
+    examId: string;
 
     constructor(private _imprintService: ImprintService, private _examService: ExamService) {
     }
 
     ngOnInit() {
+        this.urlCertificat = this.urlCertificat + this._examService.idExam + ".pdf";
         this.imprints$ = this._imprintService.imprints$;
         this.imprints$.subscribe(value => {
             this.imprints = value;
