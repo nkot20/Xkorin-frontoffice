@@ -44,6 +44,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:academic-cap',
                 link : '/apps/exams',
             },
+            {
+                id   : 'dashboards.academy',
+                title: 'Companies',
+                type : 'basic',
+                icon : 'heroicons_outline:academic-cap',
+                link : '/apps/companies',
+            },
         ],
     },
     {
