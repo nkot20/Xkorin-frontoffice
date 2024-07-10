@@ -5,6 +5,7 @@ import {inject} from "@angular/core";
 import {ExamService} from "../../../../core/exam/exam.service";
 import {catchError, throwError} from "rxjs";
 import {CompanyService} from "../../../../core/company/company.service";
+import {ListComponent} from "./list/list.component";
 
 const companiesResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const companyService =  inject(CompanyService);
@@ -31,7 +32,7 @@ const companiesResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnap
 export default [
     {
         path     : '',
-        component: CompaniesComponent,
+        component: ListComponent,
         resolve: {
             companies: companiesResolver
         }

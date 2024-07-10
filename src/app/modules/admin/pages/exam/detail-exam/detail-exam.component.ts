@@ -43,6 +43,8 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     imprintStats$: Observable<any[]>;
     imprintsValues: number[];
     imprintStats: any[];
+    // inclusive confidence index
+    cci: number;
     categories = [
         { name: 'Personal relationship', statuses: ['green star', 'green star', 'green star', 'green star', 'green star', 'green star', 'green star'] },
         { name: 'Stay in family', statuses: ['green', 'green', 'green', 'gray', 'gray', 'green star', 'green star'] },
@@ -63,13 +65,14 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             this.imprints = value;
         })
         this.examDetails$ = this._examService.examDetails$;
-        this.examScore$ = this._imprintService.indexScore$;
+        //this.examScore$ = this._imprintService.indexScore$;
         this.imprintStats$ = this._imprintService.imprintStatistics$;
         this.imprintStats$.subscribe(value => {
             this.imprintStats = value;
         });
         this._imprintService.imprintsValues$.subscribe(value => {
-            this.imprintsValues = value;
+            this.imprintsValues = value.reverse();
+            this.cci = value.reduce((sum, value) => sum + value, 0);
         })
     }
 
