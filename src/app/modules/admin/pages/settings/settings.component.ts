@@ -73,12 +73,12 @@ export class SettingsComponent implements OnInit, OnDestroy
                 title      : 'Notifications',
                 description: 'Manage when you\'ll be notified on which channels',
             },
-            {
+        /*    {
                 id         : 'team',
                 icon       : 'heroicons_outline:user-group',
                 title      : 'Team',
                 description: 'Manage your existing team and change roles/permissions',
-            },
+            },*/
         ];
 
         // Subscribe to media changes
