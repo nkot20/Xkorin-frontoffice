@@ -59,12 +59,12 @@
 
                         <ng-container matColumnDef="Company promoter name">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header > Company promoter name </th>
-                            <td mat-cell *matCellDef="let element"> {{element.admin[0].name}}  </td>
+                            <td mat-cell *matCellDef="let element"> {{element.promoter[0].name}}  </td>
                         </ng-container>
 
                         <ng-container matColumnDef="Promoter email">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header > Company promoter name </th>
-                            <td mat-cell *matCellDef="let element"> {{element.admin[0].email}} </td>
+                            <td mat-cell *matCellDef="let element"> {{element.promoter[0].email}} </td>
                         </ng-container>
                         <ng-container matColumnDef="Country">
                             <th mat-header-cell *matHeaderCellDef mat-sort-header > Country </th>
@@ -82,7 +82,7 @@
                                     <a
                                         class="min-w-10 min-h-7 h-7 px-2 leading-6"
                                         mat-stroked-button
-                                        [routerLink]="['details/'+element.admin[0]._id]">
+                                        [routerLink]="['details/'+element.promoter[0]._id]">
                                         <mat-icon
                                             class="icon-size-5"
                                             [svgIcon]="'heroicons_solid:eye'"></mat-icon>
