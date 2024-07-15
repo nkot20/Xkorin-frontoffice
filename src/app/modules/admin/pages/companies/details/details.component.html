@@ -1,0 +1,121 @@
+<div class="container mx-auto p-2" style="width: 100%;">
+    <h2 class="text-lg font-bold mb-4 mt-4 mx-4">Assessments / details</h2>
+    <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 p-4" *ngIf="(examDetails$ | async) as examDetails">
+        <!-- Tableau des informations -->
+        <div class="w-full md:w-1/3 min-w-0 bg-card shadow rounded-2xl overflow-hidden p-4">
+
+            <table class="table-auto w-full">
+                <tbody>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Request for </td>
+                    <td class="py-2">: {{examDetails.exam.aim}}</td>
+                </tr>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Institution </td>
+                    <td class="py-2">: {{examDetails.institution.name}}</td>
+                </tr>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Amount </td>
+                    <td class="py-2">: {{examDetails.exam.amount}}</td>
+                </tr>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Confidence index </td>
+                    <td class="py-2" *ngIf="indexIsAvalaible()">: Available</td>
+                    <td class="py-2" *ngIf="!indexIsAvalaible()">: Not completed</td>
+
+                </tr>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Requested at </td>
+                    <td class="py-2">: {{examDetails.exam.createdAt | date:'short'}}</td>
+                </tr>
+                <tr class="border-b">
+                    <td class="font-semibold py-2">Score </td>
+                    <td class="py-2" >: {{cci}}/6080</td>
+                </tr>
+                <tr>
+                    <td class="font-semibold py-2">Audited </td>
+                    <td class="py-2" *ngIf="examDetails.exam.audited">: Yes</td>
+                    <td class="py-2" *ngIf="!examDetails.exam.audited">: No</td>
+                </tr>
+                <tr *ngIf="indexIsAvalaible()">
+                    <td class="font-semibold py-2">Get your certificates </td>
+                    <td class="py-2"><a href="">: Click here</a></td>
+                </tr>
+                <tr *ngIf="!indexIsAvalaible()">
+                    <td class="font-semibold py-2">Continuous exam </td>
+                    <td class="py-2"><a href="{{urlCertificat}}">: Click here</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Graphique -->
+        <div class="w-full md:w-2/3 flex items-center justify-center min-w-0 bg-card shadow rounded-2xl overflow-hidden p-8">
+            <canvas id="assessmentChart" class="w-full h-80"></canvas>
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 p-4" *ngIf="(examDetails$ | async) as examDetails">
+
+        <div class="w-full md:w-3/3 flex items-center justify-center min-w-0 bg-card shadow rounded-2xl overflow-hidden p-8">
+            <canvas id="evolutionChart" class="w-full h-80" style="height: 480px !important;"></canvas>
+        </div>
+    </div>
+
+    <div class="gap-6 w-full min-w-0 bg-card shadow rounded-2xl overflow-hidden" *ngIf="(imprints$ | async) as imprints">
+        <mat-tab-group class="w-full">
+            <mat-tab *ngFor="let imprint of imprints" label="{{imprint.imprint.name}}">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full min-w-0 " *ngIf="imprint.isAvailable">
+                    <div class="social-exposure" *ngFor="let variable of imprint.variables">
+                        <h1>{{variable.name}}</h1>
+                        <div class="content mt-2">
+                            <div class="categories">
+                                <div class="exposure-row" *ngFor="let child of variable.children">
+                                    <div class="category text-end">{{ child.name }}</div>
+                                    <div class="squares" *ngIf="child.value === 7">
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'green star'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 6">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'green'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 5">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'green-white'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 4">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'orange'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 3">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'grow'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 2">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'grow-white'"></div>
+                                    </div>
+                                    <div class="squares" *ngIf="child.value === 1">
+                                        <div class="square" *ngFor="let status of toArray(7 - child.value)" [ngClass]="'gray'"></div>
+                                        <div class="square" *ngFor="let status of toArray(child.value)" [ngClass]="'red'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress" [style.height]="((variable.value * 100) / 7) + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div *ngIf="!imprint.isAvailable">
+                    <h2 class="text-2xl text-center"> Not completed </h2>
+                </div>
+
+            </mat-tab>
+        </mat-tab-group>
+
+    </div>
+</div>
+

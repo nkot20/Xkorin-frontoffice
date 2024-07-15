@@ -10,13 +10,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
         icon    : 'heroicons_outline:home',
         children: [
             {
-                id   : 'dashboards.project',
-                title: 'Project',
+                id   : 'dashboards.dashboard',
+                title: 'Dashboard',
                 type : 'basic',
                 icon : 'heroicons_outline:clipboard-document-check',
                 link : '/dashboards/project',
             },
-            {
+            /*{
                 id   : 'dashboards.analytics',
                 title: 'Analytics',
                 type : 'basic',
@@ -36,7 +36,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'heroicons_outline:currency-dollar',
                 link : '/dashboards/crypto',
-            },
+            },*/
             {
                 id   : 'dashboards.academy',
                 title: 'Assessments',
@@ -44,9 +44,30 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:academic-cap',
                 link : '/apps/exams',
             },
+            {
+                id   : 'dashboards.academy',
+                title: 'Companies',
+                type : 'basic',
+                icon : 'heroicons_outline:building-office',
+                link : '/apps/companies',
+            },
+            {
+                id   : 'dashboards.academy',
+                title: 'Audits',
+                type : 'basic',
+                icon : 'heroicons_outline:check-badge',
+                link : '/apps/companies',
+            },
+            {
+                id   : 'dashboards.settings',
+                title: 'Settings',
+                type : 'basic',
+                icon : 'heroicons_outline:cog-8-tooth',
+                link : '/pages/settings',
+            },
         ],
     },
-    {
+   /* {
         id      : 'apps',
         title   : 'Applications',
         subtitle: 'Custom made application designs',
@@ -678,13 +699,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:user-circle',
                 link : '/pages/profile',
             },
-            {
-                id   : 'pages.settings',
-                title: 'Settings',
-                type : 'basic',
-                icon : 'heroicons_outline:cog-8-tooth',
-                link : '/pages/settings',
-            },
+
         ],
     },
     {
@@ -1170,7 +1185,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
             },
         ],
-    },
+    },*/
 ];
 export const compactNavigation: FuseNavigationItem[] = [
     {

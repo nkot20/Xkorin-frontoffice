@@ -14,6 +14,8 @@ export class ImprintService {
     private _indexScore: ReplaySubject<number> = new ReplaySubject<number>();
     private _imprintStatistics: ReplaySubject<any[]> = new ReplaySubject<any[]>();
     private _imprintsValues: ReplaySubject<any[]> = new ReplaySubject<any[]>();
+    private _infosImprintDetailsCompany: ReplaySubject<any[]> = new ReplaySubject<any[]>();
+    private _examDetails: ReplaySubject<any> = new ReplaySubject<any>();
     /**
      * Constructor
      */
@@ -37,10 +39,27 @@ export class ImprintService {
         return this._imprintsValues.asObservable();
     }
 
+
+    get infosImprintDetailsCompany$(): ReplaySubject<any[]> {
+        return this._infosImprintDetailsCompany;
+    }
+
+    set infosImprintDetailsCompany$(value: ReplaySubject<any[]>) {
+        this._infosImprintDetailsCompany = value;
+    }
+
+
+    get examDetails$(): ReplaySubject<any> {
+        return this._examDetails;
+    }
+
+    set examDetails$(value: ReplaySubject<any>) {
+        this._examDetails = value;
+    }
+
     getImprintsWithVariables(profilId, subcategoryId, isoCode): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/variable-questions/' + profilId + '/' +subcategoryId + '/' + isoCode).pipe(
             tap((response: any) => {
-
                 this._imprints.next(response);
             }),
         );
@@ -48,8 +67,13 @@ export class ImprintService {
 
     getImprintsByExam(examId): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/dashboard/' + examId).pipe(
-            tap((response: any) => {
-
+            tap((response: any[]) => {
+                response = response.sort((a, b) => {
+                    if (a.imprint.number > b.imprint.number)
+                        return 1;
+                    else
+                        return -1;
+                });
                 this._imprints.next(response);
             }),
         );
@@ -78,6 +102,17 @@ export class ImprintService {
             tap((response) => {
                 this._imprintsValues.next(response);
 
+            })
+        )
+    }
+
+    getImprintsValuesDetailsCompanies(institutionId, personId): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.imprintPath + '/'  + institutionId + '/evolution/' + personId).pipe(
+            tap((response) => {
+                this._imprintsValues.next(response.imprintValue);
+                this._imprints.next(response.variableTree);
+                this._infosImprintDetailsCompany.next(response.evolution);
+                this._examDetails.next(response.examDetails);
             })
         )
     }

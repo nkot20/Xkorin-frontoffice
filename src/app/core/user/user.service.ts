@@ -2,11 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { User } from 'app/core/user/user.types';
 import { map, Observable, ReplaySubject, tap } from 'rxjs';
+import {environment} from "../../../environments/environment";
 
 @Injectable({providedIn: 'root'})
 export class UserService
 {
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
+    pathUser = '/user'
 
     /**
      * Constructor
@@ -55,11 +57,12 @@ export class UserService
     /**
      * Update the user
      *
-     * @param user
+     * @param userId
+     * @param datas
      */
-    update(user: User): Observable<any>
+    update(userId, datas): Observable<any>
     {
-        return this._httpClient.patch<User>('api/common/user', {user}).pipe(
+        return this._httpClient.patch<User>( environment.api + this.pathUser + '/update/' + userId, datas).pipe(
             map((response) =>
             {
                 this._user.next(response);

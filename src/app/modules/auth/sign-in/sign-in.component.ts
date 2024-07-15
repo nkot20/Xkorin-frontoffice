@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
+import {User} from "../../../core/user/user.types";
 
 @Component({
     selector     : 'auth-sign-in',
@@ -30,6 +31,7 @@ export class AuthSignInComponent implements OnInit
     };
     signInForm: UntypedFormGroup;
     showAlert: boolean = false;
+    user: User;
 
     /**
      * Constructor
@@ -84,16 +86,22 @@ export class AuthSignInComponent implements OnInit
         // Sign in
         this._authService.signIn(this.signInForm.value)
             .subscribe(
-                () =>
+                (value) =>
                 {
-                    // Set the redirect url.
-                    // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
-                    // to the correct page after a successful sign in. This way, that url can be set via
-                    // routing file and we don't have to touch here.
-                    const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                    console.log(this.hasRole(value.user.role, 5), value.user.role)
+                    if (this.hasRole(value.user.role, 5) && !value.user.alreadyLogin) {
+                        this._router.navigate(['/more-infos'])
+                    } else {
+                        // Set the redirect url.
+                        // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
+                        // to the correct page after a successful sign in. This way, that url can be set via
+                        // routing file and we don't have to touch here.
+                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
 
-                    // Navigate to the redirect url
-                    this._router.navigateByUrl(redirectURL);
+                        // Navigate to the redirect url
+                        this._router.navigateByUrl(redirectURL);
+                    }
+
 
                 },
                 (response) =>
@@ -114,5 +122,15 @@ export class AuthSignInComponent implements OnInit
                     this.showAlert = true;
                 },
             );
+    }
+
+    hasRole(roles, role) {
+        // Vérifier si roles est un tableau
+        if (!Array.isArray(roles)) {
+            throw new Error('Le premier argument doit être un tableau.');
+        }
+
+        // Utiliser la méthode includes() pour vérifier si le rôle est présent dans le tableau
+        return roles.includes(role);
     }
 }

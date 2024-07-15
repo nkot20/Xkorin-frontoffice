@@ -1,5 +1,6 @@
 import {Company} from "../company/company.types";
 import {Person} from "../person/person.types";
+import {Institution} from "../institution/institution.type";
 
 export interface User
 {
@@ -11,4 +12,7 @@ export interface User
     role?: number[];
     company?: Company;
     person?: Person;
+    institution?: Institution;
+    langage?: string;
+    alreadyLogin?: boolean;
 }

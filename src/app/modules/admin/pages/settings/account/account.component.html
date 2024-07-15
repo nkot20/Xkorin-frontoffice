@@ -1,7 +1,7 @@
 <div class="w-full max-w-3xl">
 
     <!-- Form -->
-    <form [formGroup]="accountForm">
+    <form [formGroup]="accountForm" *ngIf="(user$ | async) as user" (ngSubmit)="onSubmit()">
 
         <!-- Section -->
         <div class="w-full">
@@ -24,37 +24,6 @@
                         matInput>
                 </mat-form-field>
             </div>
-            <!-- Username -->
-            <div class="sm:col-span-4">
-                <mat-form-field
-                    class="fuse-mat-emphasized-affix w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Username</mat-label>
-                    <div
-                        class="text-secondary"
-                        matPrefix>
-                        fusetheme.com/
-                    </div>
-                    <input
-                        [formControlName]="'username'"
-                        matInput>
-                </mat-form-field>
-            </div>
-            <!-- Title -->
-            <div class="sm:col-span-2">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Title</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:briefcase'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'title'"
-                        matInput>
-                </mat-form-field>
-            </div>
             <!-- Company -->
             <div class="sm:col-span-2">
                 <mat-form-field
@@ -70,6 +39,29 @@
                         matInput>
                 </mat-form-field>
             </div>
+            <div class="sm:col-span-2">
+                <mat-form-field
+                    class="w-full"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-label>Company email</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:envelope'"
+                        matPrefix></mat-icon>
+                    <input
+                        [formControlName]="'companyEmail'"
+                        matInput>
+                </mat-form-field>
+            </div>
+            <!--<div class="sm:col-span-2">
+                <mat-label>Company logo</mat-label>
+                <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+                <input hidden (change)="onFileSelected($event)" #fileInput type="file">
+                <span class="file-name">{{selectedFile?.name}}</span>
+
+            </div>-->
+            <!-- Title -->
+
             <!-- About -->
             <div class="sm:col-span-4">
                 <mat-form-field
@@ -78,11 +70,11 @@
                     <mat-label>About</mat-label>
                     <textarea
                         matInput
-                        [formControlName]="'about'"
+                        [formControlName]="'description'"
                         cdkTextareaAutosize
                         [cdkAutosizeMinRows]="5"></textarea>
                 </mat-form-field>
-                <div class="mt-1 text-md text-hint">Brief description for your profile. Basic HTML and Emoji are allowed.</div>
+                <div class="mt-1 text-md text-hint">Brief description for your company. Basic HTML and Emoji are allowed.</div>
             </div>
         </div>
 
@@ -164,6 +156,36 @@
                     </mat-select>
                 </mat-form-field>
             </div>
+            <div class="sm:col-span-2">
+                <mat-form-field
+                    class="w-full"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-label>Matrimonial status</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:globe-alt'"
+                        matPrefix></mat-icon>
+                    <mat-select [formControlName]="'matrimonial'">
+                        <mat-option [value]="'Single'">Single</mat-option>
+                        <mat-option [value]="'Married'">Married</mat-option>
+                        <mat-option [value]="'Others'">Others</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="sm:col-span-2">
+                <mat-form-field
+                    class="w-full"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-label>Matrimonial status</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:globe-alt'"
+                        matPrefix></mat-icon>
+                    <mat-select [formControlName]="'educationLavel'">
+                        <mat-option *ngFor="let level of schoolLevel" [value]="level">{{level}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
         </div>
 
         <!-- Divider -->
@@ -179,7 +201,7 @@
             <button
                 class="ml-4"
                 mat-flat-button
-                type="button"
+                type="submit"
                 [color]="'primary'">Save
             </button>
         </div>

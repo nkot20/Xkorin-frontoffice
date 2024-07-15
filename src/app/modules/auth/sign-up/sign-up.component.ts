@@ -1,6 +1,15 @@
 import {AsyncPipe, NgForOf, NgIf} from '@angular/common';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormsModule, NgForm, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import {
+    AbstractControl,
+    FormsModule,
+    NgForm,
+    ReactiveFormsModule,
+    UntypedFormBuilder,
+    UntypedFormGroup, ValidationErrors,
+    ValidatorFn,
+    Validators
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -38,6 +47,7 @@ export class AuthSignUpComponent implements OnInit
     showAlert: boolean = false;
     subCategories$: Observable<SubCategory[]>;
     profils$: Observable<Profil[]>;
+    categoryType: string ;
 
     /**
      * Constructor
@@ -63,18 +73,74 @@ export class AuthSignUpComponent implements OnInit
     {
         this.subCategories$ = this._subCategoryService.subCategories$;
         this.profils$ = this._profilService.profils$;
+        this.categoryType = localStorage.getItem('categoryType');
+        if (this.categoryType === "company") {
+            // Create the form
+            this.signUpForm = this._formBuilder.group({
+                    name        : ['', Validators.required],
+                    email       : ['', [Validators.required, Validators.email]],
+                    password    : ['', [Validators.required, this.strongPasswordValidator()]],
+                    company     : ['', Validators.required],
+                    subcategory : ['', Validators.required],
+                    profil      : ['', Validators.required],
+                    agreements  : ['', Validators.requiredTrue],
+                    type  : [this.categoryType],
+                },
+            );
+        } else {
+            // Create the form
+            this.signUpForm = this._formBuilder.group({
+                    name        : ['', Validators.required],
+                    email       : ['', [Validators.required, Validators.email, this.institutionalEmailValidator()]],
+                    password    : ['', [Validators.required, this.strongPasswordValidator()], ],
+                    company     : ['', Validators.required],
+                    subcategory : ['', Validators.required],
+                    agreements  : ['', Validators.requiredTrue],
+                    type  : [this.categoryType],
+                },
+            );
+        }
 
-        // Create the form
-        this.signUpForm = this._formBuilder.group({
-                name        : ['', Validators.required],
-                email       : ['', [Validators.required, Validators.email]],
-                password    : ['', Validators.required],
-                company     : ['', Validators.required],
-                subcategory : ['', Validators.required],
-                profil      : ['', Validators.required],
-                agreements  : ['', Validators.requiredTrue],
-            },
-        );
+    }
+
+    institutionalEmailValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            if (!control.value) {
+                return null; // Don't validate empty values to allow for the required validator to handle it
+            }
+            const email = control.value;
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(edu|ac|gov|mil|org|net|int)$/i;
+
+            if (regex.test(email)) {
+                return null; // Valid email
+            } else {
+                return { institutionalEmail: true }; // Invalid email
+            }
+        };
+    }
+
+
+    strongPasswordValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const password = control.value;
+            if (!password) {
+                return null; // Don't validate empty values to allow for the required validator to handle it
+            }
+
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const minLength = password.length >= 8;
+
+            const passwordValid = hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar && minLength;
+
+            if (!passwordValid) {
+                return { strongPassword: true };
+            }
+
+            return null;
+        };
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -86,6 +152,7 @@ export class AuthSignUpComponent implements OnInit
      */
     signUp(): void
     {
+        console.log(this.signUpForm.value,this.signUpForm, this.signUpForm.invalid)
         // Do nothing if the form is invalid
         if ( this.signUpForm.invalid )
         {
@@ -108,16 +175,17 @@ export class AuthSignUpComponent implements OnInit
                 },
                 (response) =>
                 {
+
                     // Re-enable the form
                     this.signUpForm.enable();
 
                     // Reset the form
-                    this.signUpNgForm.resetForm();
+                    //this.signUpNgForm.resetForm();
 
                     // Set the alert
                     this.alert = {
                         type   : 'error',
-                        message: 'Something went wrong, please try again.',
+                        message: response.error.message,
                     };
 
                     // Show the alert
