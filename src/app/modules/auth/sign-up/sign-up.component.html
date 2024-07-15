@@ -108,6 +108,9 @@
                         <mat-error *ngIf="signUpForm.get('email').hasError('email')">
                             Please enter a valid email address
                         </mat-error>
+                        <mat-error *ngIf="signUpForm.get('email').hasError('institutionalEmail') && categoryType === 'institution'">
+                            Please enter an institutional email address
+                        </mat-error>
                     </mat-form-field>
 
                     <!-- Password field -->
@@ -133,13 +136,16 @@
                                 *ngIf="passwordField.type === 'text'"
                                 [svgIcon]="'heroicons_solid:eye-slash'"></mat-icon>
                         </button>
-                        <mat-error>
+                        <mat-error *ngIf="signUpForm.get('password').hasError('required')">
                             Password is required
+                        </mat-error>
+                        <mat-error *ngIf="signUpForm.get('password').hasError('strongPassword')" class="mb-6">
+                            Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.
                         </mat-error>
                     </mat-form-field>
 
                     <!-- profil field -->
-                    <mat-form-field class="w-full" *ngIf="(profils$ | async) as profils">
+                    <mat-form-field class="w-full" *ngIf="categoryType === 'company' && (profils$ | async) as profils ">
                         <mat-label>Profil</mat-label>
                         <mat-select [formControlName]="'profil'">
                             <mat-option *ngFor="let profil of profils" value="{{profil._id}}">{{profil.label}}</mat-option>
