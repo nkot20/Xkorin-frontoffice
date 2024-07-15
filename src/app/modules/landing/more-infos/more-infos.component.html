@@ -1,0 +1,154 @@
+<div class="bg-blue-800 fixed w-full z-10">
+    <nav class="bg-white border-gray-200 dark:bg-gray-900">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <img src="assets/images/logo/logo-bg-white.jpg" class="h-16" alt="Logo Xkorin" />
+            </a>
+            <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+                <span class="sr-only">Open main menu</span>
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+                </svg>
+            </button>
+            <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+                <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<div class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start p-18 flex-auto min-w-0 mt-5">
+    <div class="container mx-auto">
+        <form [formGroup]="moreInfosForm" class="" *ngIf="(user$ | async) as user" (ngSubmit)="onSubmit()">
+            <div class="flex flex-col sm:flex-row mx-auto p-4 ">
+            <div class="md:w-1/2 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+
+                    <h5 class="text-xl font-bold mb-2">Business informations</h5>
+                    <p class="text-gray-600 mb-4">More informations which can help us to find your business</p>
+
+                    <div class="flex items-center mb-4">
+                        <div class="mr-3 rounded bg-gray-200 p-2">
+                            <!-- Espace pour afficher l'image -->
+                            <img [src]="imageSrc" alt="Uploaded Image" id="uploadedImage" class="img-fluid">
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <h6 class="mb-1">Logo</h6>
+                            <label for="uploadInput" class="btn btn-success rounded-pill cursor-pointer">
+                                Upload
+                                <input type="file" id="uploadInput" style="display:none;" (change)="onFileSelected($event)" [formControlName]="'logo'" accept="image/*">
+                            </label>
+                            <span class="text-red-500 text-xs italic" *ngIf="moreInfosForm.get('logo').touched && moreInfosForm.get('logo').errors">Logo required</span>
+                        </div>
+                    </div>
+<!--
+                    <div class="mb-4">
+                        <mat-form-field appearance="fill" class="w-full">
+                            <mat-label>Business name</mat-label>
+                            <input matInput placeholder="Business name" id="business" [formControlName]="'name'">
+                            <mat-error *ngIf="moreInfosForm.get('name').invalid && moreInfosForm.get('name').touched">Business name required</mat-error>
+                        </mat-form-field>
+                    </div>-->
+
+                    <div class="mb-4">
+                        <mat-form-field appearance="fill" class="w-full">
+                            <mat-label>Website</mat-label>
+                            <input matInput placeholder="Website" id="website" [formControlName]="'website'">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="mb-4">
+                        <mat-form-field appearance="fill" class="w-full">
+                            <mat-label>Description</mat-label>
+                            <textarea matInput placeholder="Your business description" id="description" [formControlName]="'description'" rows="5"></textarea>
+                            <mat-error *ngIf="moreInfosForm.get('description').invalid && moreInfosForm.get('description').touched">Description required</mat-error>
+                        </mat-form-field>
+                    </div>
+                <h5 class="text-xl font-bold mt-4 mb-2">Contact informations</h5>
+                <p class="text-gray-600 mb-4">More contact informations to your business</p>
+
+                <div class="mb-4">
+                    <mat-form-field appearance="fill" class="w-full">
+                        <mat-label>Email</mat-label>
+                        <input matInput type="email" placeholder="Email" id="email" [formControlName]="'email'">
+                        <mat-error *ngIf="moreInfosForm.get('email').invalid && moreInfosForm.get('email').touched">Email required</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="mb-6">
+                    <mat-form-field appearance="fill" class="w-full">
+                        <mat-label>Phone number</mat-label>
+                        <input matInput type="tel" placeholder="Phone number" id="tel" [formControlName]="'phoneNumber'">
+                        <mat-error *ngIf="moreInfosForm.get('phoneNumber').invalid && moreInfosForm.get('phoneNumber').touched">Phone number required</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex items-center mb-4">
+                    <div class="mr-3 rounded bg-gray-200 p-2">
+                        <!-- Espace pour afficher l'image -->
+                        <img [src]="signature" alt="Uploaded Image" id="signature" class="img-fluid">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h6 class="mb-1">Your signature</h6>
+                        <label for="uploadInputSignature" class="btn btn-success rounded-pill cursor-pointer">
+                            Upload
+                            <input type="file" id="uploadInputSignature" style="display:none;" (change)="onFileSelectedToSignature($event)"  [formControlName]="'signature'">
+                        </label>
+                        <span class="text-red-500 text-xs italic" *ngIf="moreInfosForm.get('signature').touched && moreInfosForm.get('signature').errors">Signature required</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="md:w-1/2 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mx-2" style="height: max-content;">
+                <h5 class="text-xl font-bold mb-2">Your first program</h5>
+                <p class="text-gray-600 mb-4">Enter the information for your first program</p>
+
+                <div class="flex items-center mb-4">
+
+                </div>
+
+                <div class="mb-4">
+                    <mat-form-field appearance="fill" class="w-full">
+                        <mat-label>Program name</mat-label>
+                        <input matInput placeholder="Business name" id="programName" [formControlName]="'programName'">
+                        <mat-error *ngIf="moreInfosForm.get('programName').invalid && moreInfosForm.get('programName').touched">Program name required</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="mb-4">
+                    <mat-form-field class="w-full" *ngIf="(institutions$ | async) as institutions">
+                        <mat-label>Target institution</mat-label>
+                        <mat-select [formControlName]="'targetInstitution'">
+                            <mat-option *ngFor="let institution of institutions" value="{{institution._id}}">{{institution.name}}</mat-option>
+                            <mat-option value="Nothing">Nothing</mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="moreInfosForm.get('targetInstitution').hasError('required')">
+                            Institution is required
+                        </mat-error>
+
+                    </mat-form-field>
+                </div>
+                <div class="text-right">
+                    <button
+                        class="fuse-mat-button-large w-full mt-6 bg-blue-800"
+                        mat-flat-button
+                        [color]="'primary'"
+                        type="submit"
+                    >
+                        <span >
+                            Submit
+                       </span>
+                        <!-- <mat-progress-spinner
+                            *ngIf="signInForm.disabled"
+                            [diameter]="24"
+                            [mode]="'indeterminate'"></mat-progress-spinner>-->
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        </form>
+    </div>
+
+</div>

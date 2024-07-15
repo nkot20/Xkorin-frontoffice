@@ -34,6 +34,7 @@ export class ChooseProfilComponent implements OnInit{
 
     onGo() {
         localStorage.setItem('smfjskflsssf5489oop', this.category._id);
+        localStorage.setItem('categoryType', this.category.type);
         this.router.navigate(['/sign-up'])
     }
 

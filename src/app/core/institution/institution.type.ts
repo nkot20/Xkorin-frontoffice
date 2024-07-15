@@ -7,9 +7,11 @@ export interface Institution {
     email: string,
     status: string,
     business_code: string,
+    description: string,
     customization?: Customization
 }
 
 export interface Customization {
     logo: string;
+    signature: string;
 }

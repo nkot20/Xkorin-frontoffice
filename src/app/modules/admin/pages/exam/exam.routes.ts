@@ -166,7 +166,7 @@ export default [
         resolve: {
             imprints: imprintsResolver,
             exam: examDetailsResolver,
-            score: examScoreResolver,
+            //score: examScoreResolver,
             statistiques: statisticsImprintResolver,
             imprintsValue: examImprintsValuesResolver
         }

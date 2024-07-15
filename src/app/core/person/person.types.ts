@@ -4,5 +4,6 @@ export interface Person {
     subcategory_id: string;
     gender?: string;
     mobile_no?: string;
-    country_code?: string;
+    matrimonial_status?: string;
+    level_of_education?: string;
 }

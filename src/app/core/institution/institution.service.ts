@@ -32,4 +32,8 @@ export class InstitutionService {
             }),
         );
     }
+
+    updateInstitutionAfterFirstInscription(userId, institutionId, data): Observable<any> {
+        return this._httpClient.patch<Institution>(environment.api + this.pathInstitution + '/update-first-login/' + institutionId + '/user/' + userId, data);
+    }
 }
