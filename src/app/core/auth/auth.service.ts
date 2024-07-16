@@ -86,6 +86,8 @@ export class AuthService
                 // Store the user on the user service
                 this._userService.user = response.user;
 
+                localStorage.setItem('%institution%', response.user.institution._id);
+
                 // Return a new observable with the response
                 return of(response);
             }),
@@ -119,6 +121,8 @@ export class AuthService
                 {
                     this.accessToken = response.accessToken;
                 }
+
+                localStorage.setItem('%institution%', response.user.institution._id);
 
                 // Set the authenticated flag to true
                 this._authenticated = true;
