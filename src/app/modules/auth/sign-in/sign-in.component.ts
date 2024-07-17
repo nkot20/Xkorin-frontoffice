@@ -88,7 +88,6 @@ export class AuthSignInComponent implements OnInit
             .subscribe(
                 (value) =>
                 {
-                    console.log(this.hasRole(value.user.role, 5), value.user.role)
                     if (this.hasRole(value.user.role, 5) && !value.user.alreadyLogin) {
                         this._router.navigate(['/more-infos'])
                     } else {

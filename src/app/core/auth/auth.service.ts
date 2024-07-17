@@ -122,7 +122,8 @@ export class AuthService
                     this.accessToken = response.accessToken;
                 }
 
-                localStorage.setItem('%institution%', response.user.institution._id);
+                if (this.hasRole(response.user.role, 5))
+                    localStorage.setItem('%institution%', response.user.institution._id);
 
                 // Set the authenticated flag to true
                 this._authenticated = true;
@@ -209,5 +210,14 @@ export class AuthService
         return this.signInUsingToken();
     }
 
+    hasRole(roles, role) {
+        // Vérifier si roles est un tableau
+        if (!Array.isArray(roles)) {
+            throw new Error('Le premier argument doit être un tableau.');
+        }
+
+        // Utiliser la méthode includes() pour vérifier si le rôle est présent dans le tableau
+        return roles.includes(role);
+    }
 
 }
