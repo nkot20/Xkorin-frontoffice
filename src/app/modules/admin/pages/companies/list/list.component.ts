@@ -13,6 +13,7 @@ import {MatTableModule} from "@angular/material/table";
 import {AsyncPipe, NgClass, NgIf} from "@angular/common";
 import {Pagination} from "../../../../../core/pagination/Pagination";
 import {CompanyService} from "../../../../../core/company/company.service";
+import {UserService} from "../../../../../core/user/user.service";
 
 @Component({
     selector: 'app-list',
@@ -38,6 +39,7 @@ export class ListComponent implements AfterViewInit, OnDestroy, OnInit{
     searchInputControl: UntypedFormControl = new UntypedFormControl();
     @ViewChild(MatPaginator) _paginator: MatPaginator;
     @ViewChild(MatSort) _sort: MatSort;
+    institutionId: string;
 
 
     displayedColumns: string[] = ['Company name', 'Company email', 'Company promoter name', 'Promoter email', 'Country', 'Action'];
@@ -52,10 +54,12 @@ export class ListComponent implements AfterViewInit, OnDestroy, OnInit{
         private _changeDetectorRef: ChangeDetectorRef,
         private _liveAnnouncer: LiveAnnouncer,
         private _companiesService: CompanyService,
+        private _userService: UserService
     ) {
     }
 
     ngOnInit() {
+        this.institutionId = localStorage.getItem('%institution%');
         this._companiesService.pagination
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe((pagination: any) => {
@@ -69,7 +73,7 @@ export class ListComponent implements AfterViewInit, OnDestroy, OnInit{
                 takeUntil(this._unsubscribeAll),
                 switchMap(query =>
                     // Search
-                    this._companiesService.getCompanies(0, 10, 'creation_date', 'asc', query, "6675cc8228464981b4cbc539"),
+                    this._companiesService.getCompanies(0, 10, 'creation_date', 'asc', query, this.institutionId),
                 ),
             )
             .subscribe();
@@ -79,7 +83,6 @@ export class ListComponent implements AfterViewInit, OnDestroy, OnInit{
     ngAfterViewInit(): void
     {
         if (this._sort && this._paginator) {
-            console.log('changed')
 
             // Set the initial sort
             this._sort.sort({
@@ -103,7 +106,7 @@ export class ListComponent implements AfterViewInit, OnDestroy, OnInit{
                 {
                     this.isLoading = true;
 
-                    return this._companiesService.getCompanies(this._paginator.pageIndex, this._paginator.pageSize, this._sort.active, this._sort.direction, "", "6675cc8228464981b4cbc539");
+                    return this._companiesService.getCompanies(this._paginator.pageIndex, this._paginator.pageSize, this._sort.active, this._sort.direction, "", this.institutionId);
                 }),
                 map(() =>
                 {

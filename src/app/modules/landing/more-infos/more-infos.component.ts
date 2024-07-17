@@ -38,10 +38,11 @@ export class MoreInfosComponent implements OnInit{
     signature: string;
     @ViewChild('moreInfosNgForm') moreInfosNgForm: NgForm;
     moreInfosForm: FormGroup;
+    institutionId: string;
     id: string;
     loading = false;
     bussinessName = localStorage.getItem('mqjfldkfj');
-    institutions$: Observable<Institution[]>;
+    institutions: Institution[];
     user$: Observable<User>;
     userValue: User;
 
@@ -55,7 +56,10 @@ export class MoreInfosComponent implements OnInit{
     }
 
     ngOnInit(): void {
-        this.institutions$ = this._institutionService.institutions$;
+        this.institutionId = localStorage.getItem('%institution%');
+        this._institutionService.institutions$.subscribe(value => {
+            this.institutions = value.filter(item => item._id !== this.institutionId);
+        });
         this.user$ = this._userService.user$;
         this.moreInfosForm = this._formBuilder.group({
             logo: ['', Validators.required],
@@ -68,7 +72,6 @@ export class MoreInfosComponent implements OnInit{
             targetInstitution: ['', Validators.required],
         });
         this._userService.user$.subscribe(value => {
-            console.log(value)
             this.userValue = value;
         })
 
@@ -159,7 +162,8 @@ export class MoreInfosComponent implements OnInit{
             },
             program: {
                 name: this.moreInfosForm.value['programName'],
-                targetInstitutionId: this.moreInfosForm.value['targetInstitution']
+                targetInstitutionId: this.moreInfosForm.value['targetInstitution'],
+                institutionId: this.userValue.institution._id
             }
         };
 

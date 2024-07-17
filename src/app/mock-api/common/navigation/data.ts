@@ -52,6 +52,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/apps/companies',
             },
             {
+                id   : 'dashboards.programs',
+                title: 'Programs',
+                type : 'basic',
+                icon : 'heroicons_outline:globe-europe-africa',
+                link : '/apps/programs',
+            },
+            {
                 id   : 'dashboards.academy',
                 title: 'Audits',
                 type : 'basic',
