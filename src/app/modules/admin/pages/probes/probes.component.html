@@ -1,0 +1,33 @@
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent" *ngIf="(variables$ | async) as variables">
+    <div class="text-4xl font-extrabold tracking-tight mx-5 mt-5 mb-5">Probes</div>
+    <mat-tab-group animationDuration="2000ms">
+        <mat-tab *ngFor="let variablesImprint of variables" label="{{variablesImprint.name}}" (click)="changeDatasSource(variablesImprint.variables)">
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table mat-table [dataSource]="variablesImprint.dataSource" class="mat-elevation-z8">
+
+                        <!-- Variable Column -->
+                        <ng-container matColumnDef="variable">
+                            <th mat-header-cell *matHeaderCellDef> Variable </th>
+                            <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                        </ng-container>
+
+                        <!-- Dynamic Options Columns -->
+                        <ng-container *ngFor="let option of options" [matColumnDef]="option._id">
+                            <th mat-header-cell *matHeaderCellDef> {{option.label}} </th>
+                            <td mat-cell *matCellDef="let element">
+                                <mat-radio-group [(ngModel)]="selectedOptions[element._id]" [ngModel]="element.weight">
+                                    <mat-radio-button [value]="option._id" (change)="changeImportance(element._id, option._id)"></mat-radio-button>
+                                </mat-radio-group>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+                <mat-paginator [pageSizeOptions]="[5]" showFirstLastButtons></mat-paginator>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
