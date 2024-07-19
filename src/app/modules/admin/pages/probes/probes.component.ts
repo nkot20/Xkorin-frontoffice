@@ -19,6 +19,8 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {MatRadioModule} from "@angular/material/radio";
 import {WeightService} from "../../../../core/weight/weight.service";
 import {ToastrService} from "ngx-toastr";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {ImprintInstitutionService} from "../../../../core/imprintInstitution/imprint-institution.service";
 
 @Component({
     selector: 'app-probes',
@@ -42,7 +44,8 @@ import {ToastrService} from "ngx-toastr";
         NgTemplateOutlet,
         MatTabsModule,
         MatRadioModule,
-        MatTableModule
+        MatTableModule,
+        MatSlideToggleModule
     ]
 })
 export class ProbesComponent implements OnInit {
@@ -51,6 +54,8 @@ export class ProbesComponent implements OnInit {
     defaultColumns: string[] = ['variable'];
     selectedOptions: { [key: string]: string } = {};
     variables$: Observable<any[]>;
+    imprintStatus: Set<{_id: string, status: boolean, isAddedForAnInstitution: boolean}> = new Set();
+
 
 
     @ViewChildren(MatPaginator) paginators: QueryList<MatPaginator>;
@@ -59,7 +64,8 @@ export class ProbesComponent implements OnInit {
         private _optionService: OptionService,
         private _variableService: VariableService,
         private _weightService: WeightService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _imprintInstitutionService: ImprintInstitutionService
         ) {
     }
 
@@ -74,6 +80,7 @@ export class ProbesComponent implements OnInit {
 
         this.variables$.subscribe(variables => {
             variables.forEach(variablesImprint => {
+                this.imprintStatus.add({_id: variablesImprint._id, status: variablesImprint.status, isAddedForAnInstitution: variablesImprint.isAddedForAnInstitution})
                 variablesImprint.dataSource = new MatTableDataSource(variablesImprint.variables);
             });
         });
@@ -106,6 +113,24 @@ export class ProbesComponent implements OnInit {
         }, error =>  {
             this._toastService.error("Something went to wrong please try again", "Change importance value")
         })
+    }
+
+    changeImprintStatus(imprintId: string, currentStatus: string) {
+        const newStatus = currentStatus === 'Able' ? 'Enable' : 'Able';
+        this.variables$.subscribe(variables => {
+            const imprint = variables.find(variable => variable._id === imprintId);
+            if (imprint) {
+                imprint.status = newStatus;
+                const payload = {
+                    imprintId: imprint._id,
+                    status: newStatus,
+                    institutionId: localStorage.getItem('%institution%'),
+                    isAddedForAnInstitution: imprint.isAddedForAnInstitution
+                };
+                this._imprintInstitutionService.save(payload).subscribe(value => {
+                })
+            }
+        });
     }
 
 

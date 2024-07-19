@@ -4,6 +4,16 @@
         <mat-tab *ngFor="let variablesImprint of variables" label="{{variablesImprint.name}}" (click)="changeDatasSource(variablesImprint.variables)">
             <div class="table-container">
                 <div class="table-wrapper">
+                    <p class="mb-4">
+                        You can enable or disable vulnerability imprint
+                        <mat-slide-toggle class="mx-3"
+                                          [checked]="variablesImprint.status === 'Able'"
+                                          (change)="changeImprintStatus(variablesImprint._id, variablesImprint.status)"
+                                          color="primary"
+                        >
+                            {{ variablesImprint.status === 'Able' ? 'Able' : 'Enable' }}
+                        </mat-slide-toggle>
+                    </p>
                     <table mat-table [dataSource]="variablesImprint.dataSource" class="mat-elevation-z8">
 
                         <!-- Variable Column -->
