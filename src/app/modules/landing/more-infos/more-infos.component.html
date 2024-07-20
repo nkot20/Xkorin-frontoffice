@@ -83,12 +83,13 @@
                         <mat-error *ngIf="moreInfosForm.get('phoneNumber').invalid && moreInfosForm.get('phoneNumber').touched">Phone number required</mat-error>
                     </mat-form-field>
                 </div>
-
+                <mat-label>Your signature</mat-label>
                 <div class="flex items-center mb-4">
                     <div class="mr-3 rounded bg-gray-200 p-2">
                         <!-- Espace pour afficher l'image -->
                         <img [src]="signature" alt="Uploaded Image" id="signature" class="img-fluid">
                     </div>
+
                     <div class="flex flex-col items-center">
                         <h6 class="mb-1">Your signature</h6>
                         <label for="uploadInputSignature" class="btn btn-success rounded-pill cursor-pointer">
@@ -117,7 +118,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <mat-form-field class="w-full" *ngIf="(institutions$ | async) as institutions">
+                    <mat-form-field class="w-full">
                         <mat-label>Target institution</mat-label>
                         <mat-select [formControlName]="'targetInstitution'">
                             <mat-option *ngFor="let institution of institutions" value="{{institution._id}}">{{institution.name}}</mat-option>
