@@ -86,7 +86,8 @@ export class AuthService
                 // Store the user on the user service
                 this._userService.user = response.user;
 
-                localStorage.setItem('%institution%', response.user.institution._id);
+                if (this.hasRole(response.user.role, 5))
+                    localStorage.setItem('%institution%', response.user.institution._id);
 
                 // Return a new observable with the response
                 return of(response);
