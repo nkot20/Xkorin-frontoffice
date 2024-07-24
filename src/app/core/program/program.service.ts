@@ -51,6 +51,14 @@ export class ProgramService {
         );
     }
 
+    getProgramsByInstitutionIdWithoutPagination(institutionId): Observable<Program[]> {
+        return this._httpClient.get<Program[]>(environment.api + this.pathProgram + '/' + institutionId + '/no-pagination').pipe(
+            tap((response: any) => {
+                this._programs.next(response);
+            }),
+        );
+    }
+
     getAllPrograms(): Observable<Program[]> {
         return this._httpClient.get<Program[]>(environment.api + this.pathProgram).pipe(
             tap((response: any) => {

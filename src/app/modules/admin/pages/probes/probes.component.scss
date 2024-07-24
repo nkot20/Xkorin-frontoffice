@@ -1,0 +1,18 @@
+.table-container {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    display: block;
+    width: 100%;
+}
+
+table {
+    width: 100%;
+}
+
+th.mat-header-cell, td.mat-cell {
+    text-align: center;
+}

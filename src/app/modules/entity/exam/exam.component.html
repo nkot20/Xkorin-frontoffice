@@ -65,7 +65,7 @@
                         <!-- Subcategory field -->
                         <mat-form-field class="w-full">
                             <mat-label>Aim of the assessment</mat-label>
-                            <mat-select [formControlName]="'aim'">
+                            <mat-select [formControlName]="'aim'" [(ngModel)]="selectedOptionAim" (ngModelChange)="onSelectionChangeAim()" >
                                 <mat-option value="Financing">Financing</mat-option>
                                 <mat-option value="Grant">Grant</mat-option>
                                 <mat-option value="Support">Support</mat-option>
@@ -75,13 +75,24 @@
                             </mat-error>
 
                         </mat-form-field>
-                        <mat-form-field class="w-full" *ngIf="(institutions$ | async) as institutions">
+                        <mat-form-field class="w-full" >
                             <mat-label>Institution</mat-label>
-                            <mat-select [formControlName]="'institution'">
+                            <mat-select [formControlName]="'institution'" [(ngModel)]="selectedOptionInstitution" (ngModelChange)="onSelectionChangeInstitution()">
                                 <mat-option *ngFor="let institution of institutions" value="{{institution._id}}">{{institution.name}}</mat-option>
 
                             </mat-select>
                             <mat-error *ngIf="examForm.get('institution').hasError('required')">
+                                Institution is required
+                            </mat-error>
+
+                        </mat-form-field>
+                        <mat-form-field class="w-full" *ngIf="selectedOptionInstitution">
+                            <mat-label>Program</mat-label>
+                            <mat-select [formControlName]="'program'" >
+                                <mat-option *ngFor="let program of programs" value="{{program._id}}">{{program.name}}</mat-option>
+
+                            </mat-select>
+                            <mat-error *ngIf="examForm.get('program').hasError('required')">
                                 Institution is required
                             </mat-error>
 

@@ -16,6 +16,8 @@ import {FuseAlertComponent, FuseAlertType} from "../../../../@fuse/components/al
 import {ExamService} from "../../../core/exam/exam.service";
 import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {ProgramService} from "../../../core/program/program.service";
+import {Program} from "../../../core/program/program.types";
 
 @Component({
   selector: 'app-exam',
@@ -42,6 +44,8 @@ export class ExamComponent implements OnInit {
     user$: Observable<User>;
     imprint$: Observable<any>
     institutions$: Observable<Institution[]>;
+    institutions: Institution[] = [];
+    programs: Program[] = [];
     examForm: UntypedFormGroup;
     @ViewChild('examNgForm') examNgForm: NgForm;
     showAlert: boolean = false;
@@ -51,6 +55,8 @@ export class ExamComponent implements OnInit {
         type   : 'success',
         message: '',
     };
+    selectedOptionAim: string;
+    selectedOptionInstitution: string;
 
     constructor(
         private _userService: UserService,
@@ -58,7 +64,9 @@ export class ExamComponent implements OnInit {
         private _institutionService: InstitutionService,
         private _formBuilder: UntypedFormBuilder,
         private _examService: ExamService,
-        private _router: Router) {
+        private _router: Router,
+        private _programService: ProgramService
+        ) {
     }
 
     ngOnInit() {
@@ -71,10 +79,25 @@ export class ExamComponent implements OnInit {
 
         this.examForm = this._formBuilder.group({
                 institution  : ['', Validators.required],
+                program  : ['', Validators.required],
                 aim          : ['', [Validators.required]],
                 amount       : [50000],
             },
         );
+    }
+
+    onSelectionChangeAim() {
+       this._institutionService.getInstitutionsByType(this.selectedOptionAim).subscribe(value => {
+           this.institutions = value;
+       })
+    }
+
+    onSelectionChangeInstitution() {
+        if (this.selectedOptionInstitution) {
+            this._programService.getProgramsByInstitutionIdWithoutPagination(this.selectedOptionInstitution).subscribe(value => {
+                this.programs = value;
+            })
+        }
     }
 
 

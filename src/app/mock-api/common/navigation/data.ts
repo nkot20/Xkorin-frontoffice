@@ -66,6 +66,13 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 link : '/apps/companies',
             },
             {
+                id   : 'dashboards.probes',
+                title: 'Probes',
+                type : 'basic',
+                icon : 'heroicons_outline:variable',
+                link : '/apps/probes',
+            },
+            {
                 id   : 'dashboards.settings',
                 title: 'Settings',
                 type : 'basic',
