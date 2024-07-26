@@ -71,6 +71,7 @@ export class AuthSignInComponent implements OnInit
      */
     signIn(): void
     {
+        this.showAlert = false;
         // Return if the form is invalid
         if ( this.signInForm.invalid )
         {
@@ -78,19 +79,21 @@ export class AuthSignInComponent implements OnInit
         }
 
         // Disable the form
-        this.signInForm.disable();
+        //this.signInForm.disable();
 
         // Hide the alert
-        this.showAlert = false;
 
+        console.log(this.signInForm.value)
         // Sign in
         this._authService.signIn(this.signInForm.value)
             .subscribe(
                 (value) =>
                 {
+                    console.log(this.hasRole(value.user.role, 5) && !value.user.alreadyLogin)
                     if (this.hasRole(value.user.role, 5) && !value.user.alreadyLogin) {
                         this._router.navigate(['/more-infos'])
                     } else {
+
                         // Set the redirect url.
                         // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
                         // to the correct page after a successful sign in. This way, that url can be set via
@@ -105,6 +108,7 @@ export class AuthSignInComponent implements OnInit
                 },
                 (response) =>
                 {
+                    console.log(response)
                     // Re-enable the form
                     this.signInForm.enable();
 

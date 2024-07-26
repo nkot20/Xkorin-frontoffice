@@ -8,7 +8,8 @@ import {environment} from "../../../environments/environment";
 export class UserService
 {
     private _user: ReplaySubject<User> = new ReplaySubject<User>(1);
-    pathUser = '/user'
+    pathUser = '/user';
+    private _userValue: User;
 
     /**
      * Constructor
@@ -28,6 +29,7 @@ export class UserService
      */
     set user(value: User)
     {
+        this.userValue = value;
         // Store the value
         this._user.next(value);
     }
@@ -37,7 +39,16 @@ export class UserService
         return this._user.asObservable();
     }
 
-    // -----------------------------------------------------------------------------------------------------
+
+    get userValue(): User {
+        return this._userValue;
+    }
+
+    set userValue(value: User) {
+        this._userValue = value;
+    }
+
+// -----------------------------------------------------------------------------------------------------
     // @ Public methods
     // -----------------------------------------------------------------------------------------------------
 
