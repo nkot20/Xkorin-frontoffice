@@ -96,6 +96,6 @@ export class ExamsComponent implements OnInit, OnDestroy
     }
 
     onGoToNewExam() {
-        this.router.navigate(['/evaluation/new'])
+        this.router.navigate(['/assessment/new'])
     }
 }
