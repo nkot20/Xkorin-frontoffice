@@ -70,10 +70,11 @@ export class MainImprintComponent implements OnInit, OnChanges{
         if (!localStorage.getItem('exam')) {
             this.router.navigate(['/evaluation/new']);
         }
-
         this.imprints$ = this._imprintService.imprints$;
         this.user$ = this._userService.user$;
         this.updateCurrentState();
+
+
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -84,6 +85,7 @@ export class MainImprintComponent implements OnInit, OnChanges{
         this._stateService.currentVariableIndex$.subscribe(index => {
             this._stateService.currentImprintIndex$.subscribe(indexImprint => {
                 console.log(indexImprint)
+                console.log(this._stateService.getData())
                 this.variableAlreadyReaded = this._stateService.getData()[indexImprint].variables.slice(0, this._stateService.currentVariableIndexSource$.value + 1);
                 this.currentVariable = this._stateService.getData()[indexImprint].variables[this._stateService.currentVariableIndexSource$.value];
             })

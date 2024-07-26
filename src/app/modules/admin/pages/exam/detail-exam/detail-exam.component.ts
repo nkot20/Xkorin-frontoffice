@@ -13,7 +13,7 @@ import {Observable} from "rxjs";
 import {ImprintService} from "../../../../../core/imprint/imprint.service";
 import {ExamService} from "../../../../../core/exam/exam.service";
 import {environment} from "../../../../../../environments/environment";
-import {ActivatedRouteSnapshot} from "@angular/router";
+import {ActivatedRouteSnapshot, Router, RouterLink} from "@angular/router";
 
 Chart.register(...registerables);
 
@@ -33,7 +33,8 @@ Chart.register(...registerables);
         MatIconModule,
         MatMenuModule,
         NgApexchartsModule,
-        MatTabsModule
+        MatTabsModule,
+        RouterLink
     ]
 })
 export class DetailExamComponent implements AfterViewInit, OnInit {
@@ -47,6 +48,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     imprintStats: any[];
     // inclusive confidence index
     cci: number;
+    idExam: string;
     categories = [
         { name: 'Personal relationship', statuses: ['green star', 'green star', 'green star', 'green star', 'green star', 'green star', 'green star'] },
         { name: 'Stay in family', statuses: ['green', 'green', 'green', 'gray', 'gray', 'green star', 'green star'] },
@@ -60,11 +62,12 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     urlCertificat: string = environment.apiFile+'/certificats/imprints-fusion/';
     examId: string;
 
-    constructor(private _imprintService: ImprintService, private _examService: ExamService) {
+    constructor(private _imprintService: ImprintService, private _examService: ExamService, private router: Router) {
     }
 
     ngOnInit() {
         this.urlCertificat = this.urlCertificat + this._examService.idExam + ".pdf";
+        this.examId = this._examService.idExam
         this.imprints$ = this._imprintService.imprints$;
         this.imprints$.subscribe(value => {
             this.imprints = value;
@@ -76,7 +79,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             this.imprintStats = value;
         });
         this._imprintService.imprintsValues$.subscribe(value => {
-            this.imprintsValues = value.reverse();
+            this.imprintsValues = value;
             this.cci = value.reduce((sum, value) => sum + value, 0);
         })
     }
@@ -97,7 +100,8 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             min.push(value.minValue);
             max.push(value.maxValue);
             moy.push(value.averageValue);
-        })
+        });
+        this.imprintsValues.reverse();
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -158,5 +162,9 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
 
     indexIsAvalaible() {
         return this.imprints.every(value => value.isAvailable);
+    }
+
+    completedAssessment() {
+        this.router.navigate(['/assessment/complete/'+this.examId])
     }
 }

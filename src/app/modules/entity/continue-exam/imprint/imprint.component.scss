@@ -1,0 +1,61 @@
+.survey-table-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+table {
+    width: 100%;
+}
+
+th.mat-header-cell {
+    text-align: center;
+}
+
+td.mat-cell {
+    text-align: center;
+}
+
+mat-radio-group {
+    display: flex;
+    justify-content: center;
+}
+
+mat-radio-button {
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    font-weight: bold;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+}
+
+
+.floating-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent */
+    padding: 1rem;
+    border-radius: 8px;
+}

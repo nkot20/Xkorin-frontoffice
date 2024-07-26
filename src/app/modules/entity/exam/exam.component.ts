@@ -122,7 +122,7 @@ export class ExamComponent implements OnInit {
         this.showAlert = false;
 
         let payload = {
-            institutionId: this.examForm.value['institution'],
+            programId: this.examForm.value['program'],
             aim: this.examForm.value['aim'],
             amount: this.examForm.value['amount'],
             personId: this.user.person._id
@@ -137,7 +137,7 @@ export class ExamComponent implements OnInit {
                     // Navigate to the confirmation required page
                     localStorage.setItem('exam', response._id);
                     this.submit = false;
-                    this._router.navigate(['/evaluation/new/imprint']);
+                    this._router.navigate(['/assessment/new/imprint']);
                 },
                 (response) =>
                 {

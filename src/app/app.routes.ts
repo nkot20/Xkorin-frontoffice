@@ -21,7 +21,7 @@ export const appRoutes: Route[] = [
 
     // Auth routes for guests
     {
-        path: 'evaluation',
+        path: 'assessment',
         canActivate: [AuthGuard],
         canActivateChild: [AuthGuard],
         component: LayoutComponent,
@@ -30,6 +30,7 @@ export const appRoutes: Route[] = [
         },
         children: [
             {path: 'new', loadChildren: () => import('app/modules/entity/exam/exam.routes')},
+            {path: 'complete', loadChildren: () => import('app/modules/entity/continue-exam/continue-exam.routes')},
         ]
     },
 
@@ -110,7 +111,7 @@ export const appRoutes: Route[] = [
                 {path: 'mailbox', loadChildren: () => import('app/modules/admin/apps/mailbox/mailbox.routes')},
                 {path: 'notes', loadChildren: () => import('app/modules/admin/apps/notes/notes.routes')},
                 {path: 'scrumboard', loadChildren: () => import('app/modules/admin/apps/scrumboard/scrumboard.routes')},
-                {path: 'exams', loadChildren: () => import('app/modules/admin/pages/exam/exam.routes')},
+                {path: 'assessments', loadChildren: () => import('app/modules/admin/pages/exam/exam.routes')},
                 {path: 'companies', loadChildren: () => import('app/modules/admin/pages/companies/companies.routes')},
                 {path: 'programs', loadChildren: () => import('app/modules/admin/pages/programs/programs.routes')},
                 {path: 'probes', loadChildren: () => import('app/modules/admin/pages/probes/probes.routes')},

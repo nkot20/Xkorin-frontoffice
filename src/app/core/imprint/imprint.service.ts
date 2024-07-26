@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {Observable, ReplaySubject, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
+import {StateService} from "../state/state.service";
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class ImprintService {
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient)
+    constructor(private _httpClient: HttpClient, private _stateService: StateService)
     {
     }
 
@@ -60,6 +61,8 @@ export class ImprintService {
     getImprintsWithVariables(profilId, subcategoryId, isoCode): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/variable-questions/' + profilId + '/' +subcategoryId + '/' + isoCode).pipe(
             tap((response: any) => {
+                let data = [response.reverse()[0]];
+                this._stateService.setData(data);
                 this._imprints.next(response);
             }),
         );
@@ -74,6 +77,17 @@ export class ImprintService {
                     else
                         return -1;
                 });
+
+                this._imprints.next(response);
+            }),
+        );
+    }
+
+    getRemainingVariablesForImprints(profilId, subcategoryId, isoCode, examId) {
+        return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/remaining-variables/' + profilId + '/' +subcategoryId + '/' + isoCode + '/' + examId).pipe(
+            tap((response: any) => {
+                let data = [response.reverse()[0]];
+                this._stateService.setData(data);
                 this._imprints.next(response);
             }),
         );

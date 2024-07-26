@@ -1,16 +1,14 @@
 import {ActivatedRouteSnapshot, Router, RouterStateSnapshot, Routes} from '@angular/router';
-import {ExamComponent} from "./exam.component";
 import {inject} from "@angular/core"
-import {ProfilService} from "../../../core/profil/profil.service";
-import {TranslocoService} from "@ngneat/transloco";
-import {catchError, throwError} from "rxjs";
 import {ImprintService} from "../../../core/imprint/imprint.service";
 import {UserService} from "../../../core/user/user.service";
+import {TranslocoService} from "@ngneat/transloco";
+import {catchError, throwError} from "rxjs";
 import {InstitutionService} from "../../../core/institution/institution.service";
-import {ImprintComponent} from "./imprint/imprint.component";
 import {OptionService} from "../../../core/option/option.service";
-import {ExamService} from "../../../core/exam/exam.service";
 import {MainImprintComponent} from "./main-imprint/main-imprint.component";
+import {AuthService} from "../../../core/auth/auth.service";
+
 
 
 const imprintsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
@@ -18,10 +16,11 @@ const imprintsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
     const userService = inject(UserService);
     const router = inject(Router);
     const translocoService = inject(TranslocoService);
+    const authService = inject(AuthService);
     const lang = translocoService.getActiveLang();
-    const examService = inject(ExamService);
+    const id = route.paramMap.get('id');
     const user = userService.userValue;
-    return imprintService.getImprintsWithVariables(user.person.profil_id[0], user.person.subcategory_id[0], lang).pipe(
+    return imprintService.getRemainingVariablesForImprints(user.person.profil_id[0], user.person.subcategory_id[0], lang, id).pipe(
         // Error here means the requested category is not available
         catchError((error) => {
             // Log the error
@@ -36,7 +35,7 @@ const imprintsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnaps
             // Throw an error
             return throwError(error);
         }),
-    )
+    );
 };
 
 const institutionResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
@@ -87,14 +86,7 @@ const optionsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapsh
 
 export default [
     {
-        path     : '',
-        component: ExamComponent,
-        resolve: {
-            institutions: institutionResolver,
-        }
-    },
-    {
-        path     : 'imprint',
+        path     : ':id',
         component: MainImprintComponent,
         resolve: {
             imprints: imprintsResolver,
