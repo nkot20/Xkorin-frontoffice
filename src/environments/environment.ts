@@ -1,5 +1,5 @@
-const domain = '185.98.139.202';
-const hostname = '185.98.139.202';
+const domain = 'localhost:4005';
+const hostname = 'localhost:4005';
 export const environment = {
   production: false,
   apiDomain: domain,
