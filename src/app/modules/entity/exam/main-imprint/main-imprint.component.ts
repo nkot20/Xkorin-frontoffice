@@ -83,7 +83,6 @@ export class MainImprintComponent implements OnInit, OnChanges{
     updateCurrentState() {
         this._stateService.currentVariableIndex$.subscribe(index => {
             this._stateService.currentImprintIndex$.subscribe(indexImprint => {
-                console.log(indexImprint)
                 this.variableAlreadyReaded = this._stateService.getData()[indexImprint].variables.slice(0, this._stateService.currentVariableIndexSource$.value + 1);
                 this.currentVariable = this._stateService.getData()[indexImprint].variables[this._stateService.currentVariableIndexSource$.value];
             })

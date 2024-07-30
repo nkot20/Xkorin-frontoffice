@@ -34,7 +34,7 @@ export class InstitutionService {
     }
 
     getInstitutionsByType(type): Observable<Institution[]> {
-        console.log(type)
+
         return this._httpClient.get<Institution[]>(environment.api + this.pathInstitution + '/type/' +type).pipe(
             tap((response: any) => {
                 this._institutions.next(response);

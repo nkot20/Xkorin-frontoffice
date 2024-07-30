@@ -39,7 +39,6 @@ export class SubCategoryService {
     }
 
     getSubCategoriesByCategoryAndLanguage(isoCode, idCategory): Observable<SubCategory[]> {
-        console.log(isoCode, idCategory)
         return this._httpClient.get<SubCategory[]>(environment.api + this.pathSubCategory + '/' + idCategory + '/' +isoCode).pipe(
             tap((response: any) => {
                 this._subCategories.next(response);

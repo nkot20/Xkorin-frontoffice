@@ -86,7 +86,6 @@ export class LoadingBarComponent
             }))
             .subscribe((response) =>
             {
-                console.log(response);
             });
     }
 

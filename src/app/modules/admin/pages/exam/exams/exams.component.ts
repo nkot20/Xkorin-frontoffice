@@ -57,7 +57,6 @@ export class ExamsComponent implements OnInit, OnDestroy
                 this._changeDetectorRef.markForCheck();
             });
 
-        console.log(this.isAvailable)
     }
 
     /**
