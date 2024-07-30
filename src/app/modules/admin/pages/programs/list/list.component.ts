@@ -264,7 +264,6 @@ export class ListComponent implements AfterViewInit {
         }
         this._programsService.getProgramDetails(programId)
             .subscribe((program) => {
-                console.log(program)
                 // Set the selected product
                 this.selectedProgram = program;
 

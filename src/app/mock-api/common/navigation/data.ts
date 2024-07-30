@@ -1,12 +1,13 @@
 /* eslint-disable */
-import { FuseNavigationItem } from '@fuse/components/navigation';
+import {FuseNavigationItem} from '@fuse/components/navigation';
+import {UserRoles} from "../../../core/role/role.types";
 
 export const defaultNavigation: FuseNavigationItem[] = [
     {
         id      : 'dashboards',
         title   : 'Dashboards',
-        subtitle: 'Unique dashboard designs',
-        type    : 'group',
+        subtitle: '',
+        type    : 'basic',
         icon    : 'heroicons_outline:home',
         children: [
             {
@@ -15,6 +16,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type : 'basic',
                 icon : 'heroicons_outline:clipboard-document-check',
                 link : '/dashboards/project',
+                role : UserRoles.COMPANY_ADMIN || UserRoles.INSTITUTION_ADMIN
             },
             /*{
                 id   : 'dashboards.analytics',
@@ -37,49 +39,56 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 icon : 'heroicons_outline:currency-dollar',
                 link : '/dashboards/crypto',
             },*/
-            {
-                id   : 'dashboards.academy',
-                title: 'Assessments',
-                type : 'basic',
-                icon : 'heroicons_outline:academic-cap',
-                link : '/apps/assessments',
-            },
-            {
-                id   : 'dashboards.academy',
-                title: 'Companies',
-                type : 'basic',
-                icon : 'heroicons_outline:building-office',
-                link : '/apps/companies',
-            },
-            {
-                id   : 'dashboards.programs',
-                title: 'Programs',
-                type : 'basic',
-                icon : 'heroicons_outline:globe-europe-africa',
-                link : '/apps/programs',
-            },
-            {
-                id   : 'dashboards.academy',
-                title: 'Audits',
-                type : 'basic',
-                icon : 'heroicons_outline:check-badge',
-                link : '/apps/companies',
-            },
-            {
-                id   : 'dashboards.probes',
-                title: 'Probes',
-                type : 'basic',
-                icon : 'heroicons_outline:variable',
-                link : '/apps/probes',
-            },
-            {
-                id   : 'dashboards.settings',
-                title: 'Settings',
-                type : 'basic',
-                icon : 'heroicons_outline:cog-8-tooth',
-                link : '/pages/settings',
-            },
         ],
+        role: UserRoles.COMPANY_ADMIN || UserRoles.INSTITUTION_ADMIN || UserRoles.AUDITOR || UserRoles.INSTITUTION_EMPLOYEE
+    },
+    {
+        id   : 'assessments',
+        title: 'Assessments',
+        type : 'basic',
+        icon : 'heroicons_outline:academic-cap',
+        link : '/apps/assessments',
+        role : UserRoles.COMPANY_ADMIN
+    },
+    {
+        id   : 'companies',
+        title: 'Companies',
+        type : 'basic',
+        icon : 'heroicons_outline:building-office',
+        link : '/apps/companies',
+        role : UserRoles.INSTITUTION_ADMIN,
+    },
+    {
+        id   : 'programs',
+        title: 'Programs',
+        type : 'basic',
+        icon : 'heroicons_outline:globe-europe-africa',
+        link : '/apps/programs',
+        role : UserRoles.INSTITUTION_ADMIN
+    },
+    {
+        id   : 'audits',
+        title: 'Audits',
+        type : 'basic',
+        icon : 'heroicons_outline:check-badge',
+        link : '/apps/companies',
+        role : UserRoles.AUDITOR
+    },
+    {
+        id   : 'probes',
+        title: 'Probes',
+        type : 'basic',
+        icon : 'heroicons_outline:variable',
+        link : '/apps/probes',
+        role : UserRoles.INSTITUTION_ADMIN
+    },
+    {
+        id   : 'settings',
+        title: 'Settings',
+        type : 'basic',
+        icon : 'heroicons_outline:cog-8-tooth',
+        link : '/pages/settings',
+        role : UserRoles.COMPANY_ADMIN || UserRoles.COMPANY_ADMIN
     },
    /* {
         id      : 'apps',
@@ -1201,122 +1210,11 @@ export const defaultNavigation: FuseNavigationItem[] = [
         ],
     },*/
 ];
+
+/*
+*/
+export const futuristicNavigation: FuseNavigationItem[] = [];
 export const compactNavigation: FuseNavigationItem[] = [
-    {
-        id      : 'dashboards',
-        title   : 'Dashboards',
-        tooltip : 'Dashboards',
-        type    : 'aside',
-        icon    : 'heroicons_outline:home',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'apps',
-        title   : 'Apps',
-        tooltip : 'Apps',
-        type    : 'aside',
-        icon    : 'heroicons_outline:qrcode',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'pages',
-        title   : 'Pages',
-        tooltip : 'Pages',
-        type    : 'aside',
-        icon    : 'heroicons_outline:document-duplicate',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'user-interface',
-        title   : 'UI',
-        tooltip : 'UI',
-        type    : 'aside',
-        icon    : 'heroicons_outline:rectangle-stack',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'navigation-features',
-        title   : 'Navigation',
-        tooltip : 'Navigation',
-        type    : 'aside',
-        icon    : 'heroicons_outline:bars-3',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
 ];
-export const futuristicNavigation: FuseNavigationItem[] = [
-    {
-        id      : 'dashboards',
-        title   : 'DASHBOARDS',
-        type    : 'group',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'apps',
-        title   : 'APPS',
-        type    : 'group',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id   : 'others',
-        title: 'OTHERS',
-        type : 'group',
-    },
-    {
-        id      : 'pages',
-        title   : 'Pages',
-        type    : 'aside',
-        icon    : 'heroicons_outline:document-duplicate',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'user-interface',
-        title   : 'User Interface',
-        type    : 'aside',
-        icon    : 'heroicons_outline:rectangle-stack',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'navigation-features',
-        title   : 'Navigation Features',
-        type    : 'aside',
-        icon    : 'heroicons_outline:bars-3',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-];
-export const horizontalNavigation: FuseNavigationItem[] = [
-    {
-        id      : 'dashboards',
-        title   : 'Dashboards',
-        type    : 'group',
-        icon    : 'heroicons_outline:home',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'apps',
-        title   : 'Apps',
-        type    : 'group',
-        icon    : 'heroicons_outline:qrcode',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'pages',
-        title   : 'Pages',
-        type    : 'group',
-        icon    : 'heroicons_outline:document-duplicate',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'user-interface',
-        title   : 'UI',
-        type    : 'group',
-        icon    : 'heroicons_outline:rectangle-stack',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-    {
-        id      : 'navigation-features',
-        title   : 'Misc',
-        type    : 'group',
-        icon    : 'heroicons_outline:bars-3',
-        children: [], // This will be filled from defaultNavigation so we don't have to manage multiple sets of the same navigation
-    },
-];
+export const horizontalNavigation: FuseNavigationItem[] = [];
+

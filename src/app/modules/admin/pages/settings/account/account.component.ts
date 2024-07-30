@@ -59,7 +59,6 @@ export class SettingsAccountComponent implements OnInit
             .subscribe((user: User) =>
             {
                 this.userInfos = user;
-                console.log(user);
                 this.accountForm = this._formBuilder.group({
                     name    : [user.name],
                     company : [user.company.name],
@@ -106,7 +105,6 @@ export class SettingsAccountComponent implements OnInit
             email: this.accountForm.value['email'],
         }
 
-        console.log(user, person, company);
         this._userService.update(this.userInfos.id, {user, person, company}).subscribe(value => {
             this.toastr.success('Updated successfully', 'Account');
         }, error => {

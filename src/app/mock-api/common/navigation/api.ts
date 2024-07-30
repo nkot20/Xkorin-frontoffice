@@ -1,24 +1,35 @@
 import { Injectable } from '@angular/core';
 import { FuseNavigationItem } from '@fuse/components/navigation';
 import { FuseMockApiService } from '@fuse/lib/mock-api';
-import { compactNavigation, defaultNavigation, futuristicNavigation, horizontalNavigation } from 'app/mock-api/common/navigation/data';
+import {
+    compactNavigation,
+    defaultNavigation,
+    futuristicNavigation,
+    horizontalNavigation
+} from 'app/mock-api/common/navigation/data';
 import { cloneDeep } from 'lodash-es';
+import {UserService} from "../../../core/user/user.service";
 
 @Injectable({providedIn: 'root'})
 export class NavigationMockApi
 {
     private readonly _compactNavigation: FuseNavigationItem[] = compactNavigation;
-    private readonly _defaultNavigation: FuseNavigationItem[] = defaultNavigation;
+    private _defaultNavigation: FuseNavigationItem[] = defaultNavigation;
     private readonly _futuristicNavigation: FuseNavigationItem[] = futuristicNavigation;
     private readonly _horizontalNavigation: FuseNavigationItem[] = horizontalNavigation;
+    private roles: number[];
 
     /**
      * Constructor
      */
-    constructor(private _fuseMockApiService: FuseMockApiService)
+    constructor(private _fuseMockApiService: FuseMockApiService,private _userService: UserService)
     {
         // Register Mock API handlers
         this.registerHandlers();
+        this._userService.user$.subscribe(value => {
+            this.roles = value.role;
+        })
+
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -38,18 +49,18 @@ export class NavigationMockApi
             .reply(() =>
             {
                 // Fill compact navigation children using the default navigation
-                this._compactNavigation.forEach((compactNavItem) =>
+                this._defaultNavigation.forEach((defaultNavItem) =>
                 {
-                    this._defaultNavigation.forEach((defaultNavItem) =>
-                    {
-                        if ( defaultNavItem.id === compactNavItem.id )
-                        {
-                            compactNavItem.children = cloneDeep(defaultNavItem.children);
-                        }
-                    });
+                    if(this.roles.includes(defaultNavItem.role)) {
+                        this._horizontalNavigation.push(defaultNavItem)
+                        this._futuristicNavigation.push(defaultNavItem)
+                        this._compactNavigation.push(defaultNavItem)
+                    }
                 });
-
-                // Fill futuristic navigation children using the default navigation
+                this._defaultNavigation = this._defaultNavigation.filter(defaultNavItem => {
+                    return this.roles.includes(defaultNavItem.role);
+                });
+                /*// Fill futuristic navigation children using the default navigation
                 this._futuristicNavigation.forEach((futuristicNavItem) =>
                 {
                     this._defaultNavigation.forEach((defaultNavItem) =>
@@ -71,7 +82,7 @@ export class NavigationMockApi
                             horizontalNavItem.children = cloneDeep(defaultNavItem.children);
                         }
                     });
-                });
+                });*/
 
                 // Return the response
                 return [

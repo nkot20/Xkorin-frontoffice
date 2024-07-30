@@ -133,7 +133,6 @@ export class ExamComponent implements OnInit {
             .subscribe(
                 (response) =>
                 {
-                    console.log(response)
                     // Navigate to the confirmation required page
                     localStorage.setItem('exam', response._id);
                     this.submit = false;

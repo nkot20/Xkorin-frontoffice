@@ -170,7 +170,6 @@ export class AuthService
      */
     confirmEmail(token): Observable<any>
     {
-        console.log(token)
         return this._httpClient.post(environment.apiAuth + 'auth/confirm-email', {token});
     }
 

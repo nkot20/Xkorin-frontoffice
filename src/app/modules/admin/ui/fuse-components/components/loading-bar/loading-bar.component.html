@@ -343,7 +343,7 @@
                             this._httpClient.get('https://jsonplaceholder.typicode.com/posts?_delay=2000')
                                 .pipe(finalize(() => { this.apiCallStatus = 'Finished!'; }))
                                 .subscribe((response) => {
-                                    console.log(response);
+
                                 });
                         }
                     </textarea>

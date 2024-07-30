@@ -172,7 +172,6 @@ export class DetailsComponent implements AfterViewInit, OnInit {
         const ctx = document.getElementById('evolutionChart') as HTMLCanvasElement;
         const labels = index.map(data => data.date);
         const indexValues = index.map(data => data.value);
-        console.log("index", indexValues);
         const datasets = [{
             label: 'Index',
             data: indexValues,

@@ -3,7 +3,7 @@
     <div class="bg-white p-6 border-b flex flex-col md:flex-row justify-between items-center">
         <div class="flex items-center mb-4 md:mb-0">
             <img src="assets/images/logo/logo-bg-white.jpg" alt="Xkorin Logo" class="h-16 w-16 mr-2">
-            <div class="text-3xl font-bold text-blue-700" > <a routerLink="/apps/assessments">Assessment</a> > {{ imprints[currentImprintIndex].imprint.name }} Imprint</div>
+            <div class="text-3xl font-bold "  [style]="{color: imprints[currentImprintIndex].imprint.color}"> <a routerLink="/apps/assessments">Assessment</a> > {{ imprints[currentImprintIndex].imprint.name }} Imprint</div>
         </div>
         <div class="flex items-center space-x-3" *ngIf="(user$ | async) as user">
             <!--<mat-icon svgIcon="heroicons_outline:bell-alert"></mat-icon>-->
@@ -22,7 +22,7 @@
             <nav>
                 <ul *ngIf="variableAlreadyReaded.length > 0">
                     <li class="mb-1" *ngFor="let step of variableAlreadyReaded">
-                        <a class="block py-2 px-4 rounded bg-blue-500 text-white">{{step.variable.name}}</a>
+                        <a class="block py-2 px-4 rounded text-white" [style]="{'background-color': imprints[currentImprintIndex].imprint.color}">{{step.variable.name}}</a>
                     </li>
                     <li>
                         <a class="block py-2 px-4 rounded bg-gray-200">........</a>

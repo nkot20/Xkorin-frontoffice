@@ -101,7 +101,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             max.push(value.maxValue);
             moy.push(value.averageValue);
         });
-        this.imprintsValues.reverse();
+        //this.imprintsValues.reverse();
         new Chart(ctx, {
             type: 'line',
             data: {

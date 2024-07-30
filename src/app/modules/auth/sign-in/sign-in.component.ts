@@ -82,14 +82,11 @@ export class AuthSignInComponent implements OnInit
         //this.signInForm.disable();
 
         // Hide the alert
-
-        console.log(this.signInForm.value)
         // Sign in
         this._authService.signIn(this.signInForm.value)
             .subscribe(
                 (value) =>
                 {
-                    console.log(this.hasRole(value.user.role, 5) && !value.user.alreadyLogin)
                     if (this.hasRole(value.user.role, 5) && !value.user.alreadyLogin) {
                         this._router.navigate(['/more-infos'])
                     } else {
@@ -108,7 +105,6 @@ export class AuthSignInComponent implements OnInit
                 },
                 (response) =>
                 {
-                    console.log(response)
                     // Re-enable the form
                     this.signInForm.enable();
 
