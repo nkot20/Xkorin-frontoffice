@@ -44,6 +44,20 @@ th {
 td {
     text-align: center;
 }
+// add-question-modal.component.scss
+
+::ng-deep .mat-horizontal-stepper-header {
+    max-width: 40px;
+}
+
+::ng-deep .mat-horizontal-stepper-header .mat-step-label {
+    max-width: 40px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+}
+
 
 
 .floating-spinner {

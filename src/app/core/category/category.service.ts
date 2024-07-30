@@ -41,7 +41,6 @@ export class CategoryService {
     getCategoriesByLanguage(isoCode): Observable<Category[]> {
         return this._httpClient.get<Category[]>(environment.api + this.pathCategory + '/' + isoCode).pipe(
             tap((response: any) => {
-                console.log(response)
                 this._categories.next(response);
             }),
         );
