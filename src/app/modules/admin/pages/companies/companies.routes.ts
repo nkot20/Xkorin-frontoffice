@@ -40,24 +40,23 @@ const examImprintsCompanieDetailsResolver = (route: ActivatedRouteSnapshot, stat
     const userService = inject(UserService);
     const router = inject(Router);
     const id = route.paramMap.get('id');
-    userService.user$.subscribe(value => {
-        return imprintService.getImprintsValuesDetailsCompanies(value.institution._id, id).pipe(
-            // Error here means the requested category is not available
-            catchError((error) => {
-                // Log the error
-                console.error(error);
+    const user = userService.userValue
+    return imprintService.getImprintsValuesDetailsCompanies(user.institution._id, id).pipe(
+        // Error here means the requested category is not available
+        catchError((error) => {
+            // Log the error
+            console.error(error);
 
-                // Get the parent url
-                const parentUrl = state.url.split('/').slice(0, -1).join('/');
+            // Get the parent url
+            const parentUrl = state.url.split('/').slice(0, -1).join('/');
 
-                // Navigate to there
-                router.navigateByUrl(parentUrl);
+            // Navigate to there
+            router.navigateByUrl(parentUrl);
 
-                // Throw an error
-                return throwError(error);
-            }),
-        ).subscribe();
-    })
+            // Throw an error
+            return throwError(error);
+        }),
+    );
 
 };
 

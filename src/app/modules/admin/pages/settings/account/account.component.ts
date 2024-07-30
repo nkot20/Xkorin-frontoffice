@@ -12,6 +12,7 @@ import {UserService} from "../../../../../core/user/user.service";
 import {async, Observable, Subject, takeUntil} from "rxjs";
 import {User} from "../../../../../core/user/user.types";
 import {ToastrService} from "ngx-toastr";
+import {UserRoles} from "../../../../../core/role/role.types";
 
 @Component({
     selector       : 'settings-account',
@@ -59,19 +60,33 @@ export class SettingsAccountComponent implements OnInit
             .subscribe((user: User) =>
             {
                 this.userInfos = user;
-                this.accountForm = this._formBuilder.group({
-                    name    : [user.name],
-                    company : [user.company.name],
-                    description   : [user.company.description],
-                    email   : [user.email, Validators.email],
-                    companyEmail   : [user.company.email, Validators.email],
-                    phone   : [user.person.mobile_no],
-                    country : [user.company.country],
-                    language: [user.langage],
-                    matrimonial: [user.person.matrimonial_status],
-                    educationLavel: [user.person.level_of_education],
-                    //logo: ['']
-                });
+                if (user.role.includes(UserRoles.COMPANY_ADMIN) || user.role.includes(UserRoles.COMPANY_EMPLOYEE)) {
+                    this.accountForm = this._formBuilder.group({
+                        name    : [user.name],
+                        company : [user.company.name],
+                        description   : [user.company.description],
+                        email   : [user.email, Validators.email],
+                        companyEmail   : [user.company.email, Validators.email],
+                        phone   : [user.person.mobile_no],
+                        country : [user.company.country],
+                        language: [user.langage],
+                        matrimonial: [user.person.matrimonial_status],
+                        educationLavel: [user.person.level_of_education],
+                        //logo: ['']
+                    });
+                } if (user.role.includes(UserRoles.INSTITUTION_ADMIN)) {
+                    this.accountForm = this._formBuilder.group({
+                        name    : [user.name],
+                        company : [user.institution.name],
+                        description   : [user.institution.description],
+                        email   : [user.email, Validators.email],
+                        companyEmail   : [user.institution.email, Validators.email],
+                        //phone   : [user.institution.mobile_no],
+                        language: [user.langage],
+
+                        //logo: ['']
+                    });
+                }
 
                 // Mark for check
                 this._changeDetectorRef.markForCheck();
@@ -112,5 +127,10 @@ export class SettingsAccountComponent implements OnInit
         })
     }
 
+    hasRole(role) {
+        return this.userInfos.role.includes(role);
+    }
+
     protected readonly async = async;
+    protected readonly UserRoles = UserRoles;
 }

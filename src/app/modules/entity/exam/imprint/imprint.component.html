@@ -3,6 +3,7 @@
         <mat-horizontal-stepper [linear]="true" #stepper [selectedIndex]="currentStepperIndex$ | async">
             <mat-step formGroupName="initialStep" [stepControl]="horizontalStepperForm.get('initialStep')">
                 <ng-template matStepLabel>Importance</ng-template>
+                <h2 class="mt-3 mb-4 text-3xl"> Importance of each variable</h2>
                 <table mat-table [dataSource]="getInitialQuestions()" class="mat-elevation-z8">
                     <ng-container matColumnDef="question">
                         <th mat-header-cell *matHeaderCellDef> Questions </th>
@@ -36,6 +37,7 @@
 
             <mat-step *ngFor="let variable of variable.children; let i = index" [formGroupName]="'step' + (i + 1)" [stepControl]="horizontalStepperForm.get('step' + (i + 1))">
                 <ng-template matStepLabel>{{ variable.name }}</ng-template>
+                <h2 class="mt-3 mb-4 text-3xl">{{ variable.name }}</h2>
                 <table mat-table [dataSource]="getQuestions(i)" class="mat-elevation-z8 mt-5">
                     <ng-container matColumnDef="question">
                         <th mat-header-cell *matHeaderCellDef> Questions </th>
