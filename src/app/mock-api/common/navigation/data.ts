@@ -88,8 +88,17 @@ export const defaultNavigation: FuseNavigationItem[] = [
         type : 'basic',
         icon : 'heroicons_outline:cog-8-tooth',
         link : '/pages/settings',
-        role : UserRoles.COMPANY_ADMIN || UserRoles.COMPANY_ADMIN
+        role : UserRoles.COMPANY_ADMIN
     },
+    {
+        id   : 'settings',
+        title: 'Settings',
+        type : 'basic',
+        icon : 'heroicons_outline:cog-8-tooth',
+        link : '/pages/settings',
+        role : UserRoles.INSTITUTION_ADMIN
+    },
+
    /* {
         id      : 'apps',
         title   : 'Applications',

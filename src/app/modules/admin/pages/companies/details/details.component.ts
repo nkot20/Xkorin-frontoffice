@@ -1,24 +1,25 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
-import {Observable} from "rxjs";
-import {environment} from "../../../../../../environments/environment";
-import {ImprintService} from "../../../../../core/imprint/imprint.service";
-import {ExamService} from "../../../../../core/exam/exam.service";
-import {Chart, registerables} from "chart.js";
-import {MatProgressBarModule} from "@angular/material/progress-bar";
-import {CommonModule, NgClass, NgForOf} from "@angular/common";
-import {MatButtonModule} from "@angular/material/button";
-import {MatButtonToggleModule} from "@angular/material/button-toggle";
-import {MatIconModule} from "@angular/material/icon";
-import {MatMenuModule} from "@angular/material/menu";
-import {NgApexchartsModule} from "ng-apexcharts";
-import {MatTabsModule} from "@angular/material/tabs";
+import {AfterViewInit, ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { tap, filter, switchMap } from 'rxjs/operators';
+import { environment } from "../../../../../../environments/environment";
+import { ImprintService } from "../../../../../core/imprint/imprint.service";
+import { ExamService } from "../../../../../core/exam/exam.service";
+import { Chart, registerables } from "chart.js";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { CommonModule, NgClass, NgForOf } from "@angular/common";
+import { MatButtonModule } from "@angular/material/button";
+import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatIconModule } from "@angular/material/icon";
+import { MatMenuModule } from "@angular/material/menu";
+import { NgApexchartsModule } from "ng-apexcharts";
+import { MatTabsModule } from "@angular/material/tabs";
 
 Chart.register(...registerables);
 
 @Component({
-  selector: 'app-details',
-  templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss'],
+    selector: 'app-details',
+    templateUrl: './details.component.html',
+    styleUrls: ['./details.component.scss'],
     standalone: true,
     imports: [
         MatProgressBarModule,
@@ -36,21 +37,20 @@ Chart.register(...registerables);
 export class DetailsComponent implements AfterViewInit, OnInit {
 
     imprints$: Observable<any[]>;
-    imprints: any[];
+    imprints: any[] = [];
     examDetails$: Observable<any>;
     infosDetailsCompany: any;
     imprintStats$: Observable<any[]>;
-    imprintsValues: number[];
-    imprintStats: any[];
-    // inclusive confidence index
+    imprintsValues: number[] = [];
+    imprintStats: any[] = [];
     cci: number;
-    imprintsNames: string[];
+    imprintsNames: string[] = [];
     categories = [
         {
             name: 'Personal relationship',
             statuses: ['green star', 'green star', 'green star', 'green star', 'green star', 'green star', 'green star']
         },
-        {name: 'Stay in family', statuses: ['green', 'green', 'green', 'gray', 'gray', 'green star', 'green star']},
+        { name: 'Stay in family', statuses: ['green', 'green', 'green', 'gray', 'gray', 'green star', 'green star'] },
         {
             name: 'Member of a local association',
             statuses: ['green', 'green', 'green', 'gray', 'gray', 'green star', 'green star']
@@ -65,38 +65,58 @@ export class DetailsComponent implements AfterViewInit, OnInit {
         }
     ];
 
-
     progress = 80;
     urlCertificat: string = environment.apiFile + '/certificats/imprints-fusion/';
     examId: string;
 
-    constructor(private _imprintService: ImprintService, private _examService: ExamService) {
-    }
+    private dataLoaded = new BehaviorSubject<boolean>(false);
+
+    constructor(private _imprintService: ImprintService, private _examService: ExamService, private cd: ChangeDetectorRef) { }
 
     ngOnInit() {
         this.urlCertificat = this.urlCertificat + this._examService.idExam + ".pdf";
+
         this.imprints$ = this._imprintService.imprints$;
-        this.imprints$.subscribe(value => {
-            this.imprints = value;
-        })
         this.examDetails$ = this._imprintService.examDetails$;
-        //this.examScore$ = this._imprintService.indexScore$;
         this.imprintStats$ = this._imprintService.imprintStatistics$;
-        this.imprintStats$.subscribe(value => {
-            this.imprintStats = value;
-        });
-        this._imprintService.imprintsValues$.subscribe(value => {
-            this.imprintsValues = value.reverse();
-            this.cci = value.reduce((sum, value) => sum + value, 0);
-        });
-        this._imprintService.infosImprintDetailsCompany$.subscribe(value => {
-            this.infosDetailsCompany = value;
-        });
+
+        this._imprintService.imprintsValues$.pipe(
+            tap(value => {
+                this.imprintsValues = value.reverse();
+                this.cci = value.reduce((sum, value) => sum + value, 0);
+            })
+        ).subscribe();
+
+        this.imprintStats$.pipe(
+            tap(value => {
+                this.imprintStats = value;
+            })
+        ).subscribe();
+
+        this._imprintService.infosImprintDetailsCompany$.pipe(
+            tap(value => {
+                this.infosDetailsCompany = value;
+                this.dataLoaded.next(true); // Déclencher l'événement une fois que les données sont chargées
+            })
+        ).subscribe();
+        this.dataLoaded.pipe(
+            filter(loaded => loaded),
+            switchMap(() => combineLatest([this.imprints$, this.imprintStats$])),
+            tap(([imprints, imprintStats]) => {
+                this.imprints = imprints;
+                this.imprintStats = imprintStats;
+
+                // Utilisez ChangeDetectorRef pour forcer une vérification des changements
+                this.cd.detectChanges();
+                this.renderChart(imprintStats);
+                this.renderChartEvolution(this.infosDetailsCompany.indexValues, this.infosDetailsCompany.imprintsData);
+            })
+        ).subscribe();
     }
 
     ngAfterViewInit() {
-        this.renderChart(this.imprintStats);
-        this.renderChartEvolution(this.infosDetailsCompany.indexValues, this.infosDetailsCompany.imprintsData)
+        // Assurez-vous que les données sont chargées avant d'appeler renderChartEvolution
+
     }
 
     renderChart(datas: any[]) {
@@ -111,7 +131,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             min.push(value.minValue);
             max.push(value.maxValue);
             moy.push(value.averageValue);
-        })
+        });
         this.imprintsNames = labels;
         new Chart(ctx, {
             type: 'line',
@@ -149,7 +169,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             },
             options: {
                 responsive: true,
-                animations: {
+                /*animations: {
                     tension: {
                         duration: 1000,
                         easing: 'linear',
@@ -157,7 +177,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
                         to: 0,
                         loop: true
                     }
-                },
+                },*/
                 scales: {
                     y: {
                         beginAtZero: true
@@ -166,7 +186,6 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             }
         });
     }
-
 
     renderChartEvolution(index: any[], imprintsData: any[]) {
         const ctx = document.getElementById('evolutionChart') as HTMLCanvasElement;
@@ -198,7 +217,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             },
             options: {
                 responsive: true,
-                animations: {
+                /*animations: {
                     tension: {
                         duration: 1000,
                         easing: 'linear',
@@ -206,7 +225,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
                         to: 0,
                         loop: true
                     }
-                },
+                },*/
                 scales: {
                     y: {
                         beginAtZero: true
@@ -215,6 +234,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             }
         });
     }
+
     toArray(value) {
         return Array(value).fill(0)
     }
