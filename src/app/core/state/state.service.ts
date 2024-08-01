@@ -47,7 +47,7 @@ export class StateService {
 
     nextImprint() {
         let currentImprintIndex = this.currentImprintIndexSource.value;
-
+        console.log("Current imprint ",currentImprintIndex);
         if (currentImprintIndex < this.data.length - 1) {
             currentImprintIndex++;
             this.currentImprintIndexSource.next(currentImprintIndex);

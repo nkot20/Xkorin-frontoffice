@@ -199,6 +199,7 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
     }
 
     submitForm(): void {
+        this._stateService.nextVariable();
         this.isLoading = true;
         const steps = this.horizontalStepperForm.value;
         let result = [];
@@ -215,7 +216,7 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
         }
         this._answerService.saveAnswer(result).subscribe(value => {
             this.isLoading = false;
-            this._stateService.nextVariable();
+
         }, error => {
             // Gérer les erreurs
             this.isLoading = false;

@@ -95,7 +95,7 @@
                                 </div>
                             </div>
                             <div class="progress-container">
-                                <div class="progress-bar">
+                                <div class="progress-bar" [style.height]="((variable.children.length * 100)/2) + 'px'">
                                     <div class="progress" [style.height]="((variable.value * 100) / 7) + '%'"></div>
                                 </div>
                             </div>
