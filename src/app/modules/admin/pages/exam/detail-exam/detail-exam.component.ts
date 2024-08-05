@@ -9,11 +9,11 @@ import {MatMenuModule} from "@angular/material/menu";
 import {NgApexchartsModule} from "ng-apexcharts";
 import { Chart, registerables } from 'chart.js';
 import {MatTabsModule} from "@angular/material/tabs";
-import {Observable} from "rxjs";
+import {Observable, Subscription, tap} from "rxjs";
 import {ImprintService} from "../../../../../core/imprint/imprint.service";
 import {ExamService} from "../../../../../core/exam/exam.service";
 import {environment} from "../../../../../../environments/environment";
-import {ActivatedRouteSnapshot, Router, RouterLink} from "@angular/router";
+import {ActivatedRoute, ActivatedRouteSnapshot, Router, RouterLink} from "@angular/router";
 
 Chart.register(...registerables);
 
@@ -44,8 +44,11 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     examDetails$: Observable<any>;
     examScore$: Observable<number>;
     imprintStats$: Observable<any[]>;
+    imprintsValues$: Subscription;
     imprintsValues: number[];
     imprintStats: any[];
+    examDetails: any;
+
     // inclusive confidence index
     cci: number;
     idExam: string;
@@ -61,31 +64,77 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     progress = 80;
     urlCertificat: string = environment.apiFile+'/certificats/imprints-fusion/';
     examId: string;
+    loadingExam = true;
+    loadingImprints = true;
+    loadingImprintsValue = true;
+    loadingStatistiques = true;
+    indexIsAvalaible = false;
 
-    constructor(private _imprintService: ImprintService, private _examService: ExamService, private router: Router) {
+    constructor(
+        private _imprintService: ImprintService,
+        private _examService: ExamService,
+        private router: Router,
+        private route: ActivatedRoute,) {
     }
 
     ngOnInit() {
-        this.urlCertificat = this.urlCertificat + this._examService.idExam + ".pdf";
-        this.examId = this._examService.idExam
-        this.imprints$ = this._imprintService.imprints$;
-        this.imprints$.subscribe(value => {
-            this.imprints = value;
-        })
-        this.examDetails$ = this._examService.examDetails$;
+        const id = this.route.snapshot.paramMap.get('id');
+        this.urlCertificat = this.urlCertificat + id + ".pdf";
+        this.examId = id
         //this.examScore$ = this._imprintService.indexScore$;
-        this.imprintStats$ = this._imprintService.imprintStatistics$;
-        this.imprintStats$.subscribe(value => {
-            this.imprintStats = value;
+
+
+        this.urlCertificat = `${this._examService.idExam}.pdf`;
+        this.examId = this._examService.idExam;
+
+        this.examDetails$ = this._examService.getExamById(id).pipe(
+            tap((value) => {
+                this.examDetails = value;
+                this.loadingExam = true
+            }),
+            tap(exam => {
+                this.examDetails = exam;
+                this.loadingExam = false;
+            })
+        );
+
+        this.imprints$ = this._imprintService.getImprintsByExam(id).pipe(
+            tap(() => this.loadingImprints = true),
+            tap(imprints => {
+                this.imprints = imprints;
+                console.log(imprints)
+                this.indexIsAvalaible = this.imprints.every(value => value.isAvailable);
+                this.loadingImprints = false;
+            })
+        );
+
+        this._imprintService.getStatistics().pipe(
+            tap(() => this.loadingStatistiques = true),
+            tap(stats => {
+                this.imprintStats = stats;
+                console.log(stats);
+                this.renderChart(this.imprintStats);
+            })
+        ).subscribe({
+            next: () => this.loadingStatistiques = false,
+            error: () => this.loadingStatistiques = false
         });
-        this._imprintService.imprintsValues$.subscribe(value => {
-            this.imprintsValues = value;
-            this.cci = value.reduce((sum, value) => sum + value, 0);
-        })
+
+        this.imprintsValues$ = this._imprintService.getImprintsValues(id).pipe(
+            tap(() => this.loadingImprintsValue = true),
+            tap(values => {
+                this.imprintsValues = values;
+                console.log('imprintvalues', values);
+                this.cci = values.reduce((sum, value) => sum + value, 0);
+            })
+        ).subscribe({
+            next: () => this.loadingImprintsValue = false,
+            error: () => this.loadingImprintsValue = false
+        });
     }
 
     ngAfterViewInit() {
-        this.renderChart(this.imprintStats);
+
     }
 
     renderChart(datas: any[]) {
@@ -138,7 +187,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             },
             options: {
                 responsive: true,
-                animations: {
+                /*animations: {
                     tension: {
                         duration: 1000,
                         easing: 'linear',
@@ -146,7 +195,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
                         to: 0,
                         loop: true
                     }
-                },
+                },*/
                 scales: {
                     y: {
                         beginAtZero: true
@@ -160,9 +209,6 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
         return Array(value).fill(0)
     }
 
-    indexIsAvalaible() {
-        return this.imprints.every(value => value.isAvailable);
-    }
 
     completedAssessment() {
         this.router.navigate(['/assessment/complete/'+this.examId])

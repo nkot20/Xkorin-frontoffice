@@ -18,27 +18,23 @@ const examsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot
     const examService = inject(ExamService);
     const userService = inject(UserService);
     const router = inject(Router);
+    const user = userService.userValue
+    return examService.getPersonExam(user.person._id).pipe(
+        // Error here means the requested category is not available
+        catchError((error) => {
+            // Log the error
+            console.error(error);
 
-    return userService.user$.subscribe(user => {
-        return examService.getPersonExam(user.person._id).pipe(
-            // Error here means the requested category is not available
-            catchError((error) => {
-                // Log the error
-                console.error(error);
+            // Get the parent url
+            const parentUrl = state.url.split('/').slice(0, -1).join('/');
 
-                // Get the parent url
-                const parentUrl = state.url.split('/').slice(0, -1).join('/');
+            // Navigate to there
+            router.navigateByUrl(parentUrl);
 
-                // Navigate to there
-                router.navigateByUrl(parentUrl);
-
-                // Throw an error
-                return throwError(error);
-            }),
-        ).subscribe(value => {
-
-        });
-    });
+            // Throw an error
+            return throwError(error);
+        }),
+    );
 };
 const imprintsResolver = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const imprintService =  inject(ImprintService);
@@ -157,18 +153,18 @@ export default [
         path     : '',
         component: ExamsComponent,
         resolve  : {
-            boards: examsResolver
+            //boards: examsResolver
         },
     },
     {
         path: 'details/:id',
         component: DetailExamComponent,
         resolve: {
-            imprints: imprintsResolver,
-            exam: examDetailsResolver,
+            //imprints: imprintsResolver,
+            //exam: examDetailsResolver,
             //score: examScoreResolver,
-            statistiques: statisticsImprintResolver,
-            imprintsValue: examImprintsValuesResolver
+            //statistiques: statisticsImprintResolver,
+            //imprintsValue: examImprintsValuesResolver
         }
     }
 ] as Routes;
