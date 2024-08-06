@@ -13,6 +13,7 @@ import {InstitutionService} from "../../../core/institution/institution.service"
 import {MatOptionModule} from "@angular/material/core";
 import {MatSelectModule} from "@angular/material/select";
 import {User} from "../../../core/user/user.types";
+import {Helper} from "../../../core/Common/Helper";
 
 @Component({
     selector: 'app-more-infos',
@@ -87,7 +88,7 @@ export class MoreInfosComponent implements OnInit{
                 console.error('Le fichier sélectionné n\'est pas une image.');
                 return;
             }
-            this.uploadImage(file)
+            Helper.uploadImage(file)
                     .then(base64Image => {
                         this.imageSrc = base64Image;
                         // Gérer la représentation en base64 de l'image selon vos besoins
@@ -107,7 +108,7 @@ export class MoreInfosComponent implements OnInit{
                 console.error('Le fichier sélectionné n\'est pas une image.');
                 return;
             }
-            this.uploadImage(file)
+            Helper.uploadImage(file)
                 .then(base64Image => {
                     this.signature = base64Image;
                     // Gérer la représentation en base64 de l'image selon vos besoins
@@ -119,28 +120,6 @@ export class MoreInfosComponent implements OnInit{
         }
     }
 
-    uploadImage(file: File): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = (event) => {
-                // Obtention de l'image en base64
-                const base64String = reader.result as string;
-
-                // Vérification si l'image est au format base64
-                if (!base64String.startsWith('data:image')) {
-                    reject(new Error('Le fichier uploadé n\'est pas une image valide.'));
-                    return;
-                }
-
-                // Renvoie de l'image en base64
-                resolve(base64String);
-            };
-
-            // Lecture du fichier en tant que URL de données (base64)
-            reader.readAsDataURL(file);
-        });
-    }
 
 
     onSubmit() {
