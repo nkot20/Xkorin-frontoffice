@@ -4,43 +4,20 @@ import {UserRoles} from "../../../core/role/role.types";
 
 export const defaultNavigation: FuseNavigationItem[] = [
     {
-        id      : 'dashboards',
-        title   : 'Dashboards',
-        subtitle: '',
-        type    : 'basic',
-        icon    : 'heroicons_outline:home',
-        children: [
-            {
-                id   : 'dashboards.dashboard',
-                title: 'Dashboard',
-                type : 'basic',
-                icon : 'heroicons_outline:clipboard-document-check',
-                link : '/dashboards/project',
-                role : UserRoles.COMPANY_ADMIN || UserRoles.INSTITUTION_ADMIN
-            },
-            /*{
-                id   : 'dashboards.analytics',
-                title: 'Analytics',
-                type : 'basic',
-                icon : 'heroicons_outline:chart-pie',
-                link : '/dashboards/analytics',
-            },
-            {
-                id   : 'dashboards.finance',
-                title: 'Finance',
-                type : 'basic',
-                icon : 'heroicons_outline:banknotes',
-                link : '/dashboards/finance',
-            },
-            {
-                id   : 'dashboards.crypto',
-                title: 'Crypto',
-                type : 'basic',
-                icon : 'heroicons_outline:currency-dollar',
-                link : '/dashboards/crypto',
-            },*/
-        ],
-        role: UserRoles.COMPANY_ADMIN || UserRoles.INSTITUTION_ADMIN || UserRoles.AUDITOR || UserRoles.INSTITUTION_EMPLOYEE
+        id   : 'dashboard',
+        title: 'Dashboard',
+        type : 'basic',
+        icon : 'heroicons_outline:clipboard-document-check',
+        link : '/dashboards/project',
+        role : UserRoles.COMPANY_ADMIN
+    },
+    {
+        id   : 'dashboard',
+        title: 'Dashboard',
+        type : 'basic',
+        icon : 'heroicons_outline:clipboard-document-check',
+        link : '/dashboards/project',
+        role : UserRoles.INSTITUTION_ADMIN
     },
     {
         id   : 'assessments',

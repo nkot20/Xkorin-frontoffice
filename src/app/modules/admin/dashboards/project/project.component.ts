@@ -12,6 +12,7 @@ import { TranslocoModule } from '@ngneat/transloco';
 import { ProjectService } from 'app/modules/admin/dashboards/project/project.service';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
 import { Subject, takeUntil } from 'rxjs';
+import {UserService} from "../../../../core/user/user.service";
 
 @Component({
     selector       : 'project',
@@ -39,6 +40,7 @@ export class ProjectComponent implements OnInit, OnDestroy
     constructor(
         private _projectService: ProjectService,
         private _router: Router,
+        private _userService: UserService
     )
     {
     }

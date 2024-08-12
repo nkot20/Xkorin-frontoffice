@@ -61,8 +61,9 @@ export class ImprintService {
     getImprintsWithVariables(profilId, subcategoryId, isoCode): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/variable-questions/' + profilId + '/' +subcategoryId + '/' + isoCode).pipe(
             tap((response: any) => {
-                let data = [response.reverse()[0]];
-                this._stateService.setData(data);
+
+                this._stateService.setData(response);
+
                 this._imprints.next(response);
             }),
         );
@@ -86,8 +87,7 @@ export class ImprintService {
     getRemainingVariablesForImprints(profilId, subcategoryId, isoCode, examId) {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/remaining-variables/' + profilId + '/' +subcategoryId + '/' + isoCode + '/' + examId).pipe(
             tap((response: any) => {
-                let data = [response.reverse()[0]];
-                this._stateService.setData(data);
+                this._stateService.setData(response);
                 this._imprints.next(response);
             }),
         );
