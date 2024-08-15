@@ -1,5 +1,12 @@
-import { CurrencyPipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {AsyncPipe, CurrencyPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewEncapsulation
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatRippleModule } from '@angular/material/core';
@@ -11,16 +18,24 @@ import { Router } from '@angular/router';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ProjectService } from 'app/modules/admin/dashboards/project/project.service';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
-import { Subject, takeUntil } from 'rxjs';
+import {Observable, Subject, takeUntil, tap} from 'rxjs';
 import {UserService} from "../../../../core/user/user.service";
+import {MatCardModule} from "@angular/material/card";
+import {ExamService} from "../../../../core/exam/exam.service";
+import {ImprintService} from "../../../../core/imprint/imprint.service";
+import {Chart, registerables} from "chart.js";
+import {User} from "../../../../core/user/user.types";
+
+Chart.register(...registerables);
 
 @Component({
     selector       : 'project',
     templateUrl    : './project.component.html',
+    styleUrls      : ['./project.component.scss'],
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe],
+    imports: [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe, AsyncPipe, MatCardModule],
 })
 export class ProjectComponent implements OnInit, OnDestroy
 {
@@ -32,7 +47,71 @@ export class ProjectComponent implements OnInit, OnDestroy
     chartYearlyExpenses: ApexOptions = {};
     data: any;
     selectedProject: string = 'ACME Corp. Backend App';
+    infosDetails: any;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    user$: Observable<any>;
+    user: User;
+    exams: any[];
+    isLoading = true;
+    isLoadingInfosDetails = true;
+    isLoadingOtherDatas = true;
+    totalAmount: number = 0;
+    imprintsNames: string[] = [];
+    exams$: Observable<any[]>;
+    infosDatas$: Observable<any[]>;
+    lastIndex: number = 0;
+    averageIndex: number = 0;
+    // Private
+    lineChartData = [
+        { data: [2, 3, 5, 7, 8, 10, 9, 11], label: 'Assessments' }
+    ];
+
+    lineChartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+
+    lineChartOptions = {
+        responsive: true
+    };
+
+    lineChartColors = [
+        {
+            borderColor: 'purple',
+            backgroundColor: 'rgba(255,255,255,0)',
+        },
+    ];
+
+    lineChartLegend = true;
+    lineChartType = 'line';
+
+    // Index chart data
+    indexChartData = [
+        { data: [1, 2, 3, 4, 5], label: 'Max', borderColor: 'green', fill: false },
+        { data: [0.5, 1, 1.5, 2, 2.5], label: 'Min', borderColor: 'red', fill: false },
+        { data: [0.8, 1.2, 1.6, 2.2, 2.8], label: 'Avg', borderColor: 'black', fill: false },
+    ];
+
+    indexChartLabels = ['Vulgarization', 'Training', 'Differentiation', 'Modernization', 'Networking'];
+
+    indexChartOptions = {
+        responsive: true
+    };
+
+    indexChartColors = [
+        {
+            borderColor: 'green',
+            backgroundColor: 'rgba(255,255,255,0)',
+        },
+        {
+            borderColor: 'red',
+            backgroundColor: 'rgba(255,255,255,0)',
+        },
+        {
+            borderColor: 'black',
+            backgroundColor: 'rgba(255,255,255,0)',
+        }
+    ];
+
+    indexChartLegend = true;
+    indexChartType = 'line';
 
     /**
      * Constructor
@@ -40,7 +119,9 @@ export class ProjectComponent implements OnInit, OnDestroy
     constructor(
         private _projectService: ProjectService,
         private _router: Router,
-        private _userService: UserService
+        private _userService: UserService,
+        private _examService: ExamService,
+        private _imprintService: ImprintService
     )
     {
     }
@@ -63,25 +144,120 @@ export class ProjectComponent implements OnInit, OnDestroy
                 this.data = data;
 
                 // Prepare the chart data
-                this._prepareChartData();
+                //this._prepareChartData();
             });
 
-        // Attach SVG fill fixer to all ApexCharts
-        window['Apex'] = {
-            chart: {
-                events: {
-                    mounted: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                    updated: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                },
-            },
-        };
+        this.user$ = this._userService.user$;
+        this.user = this._userService.userValue;
+
+        const personId = this._userService.userValue.person._id;
+        // Get the boards
+        this.exams$ = this._examService.getPersonExam(personId).pipe(
+            tap( () => this.isLoading = true),
+            tap( exams => {
+                this.exams = exams;
+                this.totalAmount = exams.reduce((sum, item) => sum + item.exam.amount, 0)
+                this.isLoading = false; // Stop showing the loader
+                //this._changeDetectorRef.detectChanges();
+                this.renderChartAssessmentEvolution(exams);
+            })
+        );
+
+        this.infosDatas$ = this._imprintService.getImprintsValuesEvolutionOfPerson(personId)
+        .pipe(
+            tap( () => this.isLoading = true),
+            tap(infosDetails => {
+                this.infosDetails = infosDetails;
+                this.isLoadingInfosDetails = false;
+                infosDetails.variableTree.forEach(item => {
+                    this.imprintsNames.push(item.imprint.name)
+                });
+                this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues - 1].value
+                this.averageIndex = (this.infosDetails.evolution.indexValues.reduce((sum, item) => sum + item.value)) / this.infosDetails.evolution.indexValues.length
+                this.renderChartEvolution(this.infosDetails.evolution.indexValues, this.infosDetails.evolution.imprintsData);
+
+            })
+        );
     }
+
+    renderChartEvolution(index: any[], imprintsData: any[]) {
+        const ctx = document.getElementById('evolutionChart') as HTMLCanvasElement;
+        const labels = index.map(data => data.date);
+        const indexValues = index.map(data => data.value);
+        const datasets = [{
+            label: 'Index',
+            data: indexValues,
+            borderColor: 'blue',
+            fill: false,
+        },];
+
+        const colors = ['red', 'green', 'orange', 'purple', 'brown'];
+
+        imprintsData.forEach((imprintData, index) => {
+            const imprintValues = imprintData.map(data => data.value);
+            datasets.push({
+                label: this.imprintsNames[index],
+                data: imprintValues,
+                borderColor: colors[index % colors.length],
+                fill: false,
+            });
+        });
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets,
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    renderChartAssessmentEvolution(exams: any[]) {
+        const examCountsByMonth = Array(12).fill(0);
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        exams.forEach(item => {
+            const date = new Date(item.exam.createdAt);
+            const month = date.getMonth(); // Extract month (0-based)
+            examCountsByMonth[month]++;
+        });
+
+        const ctx = document.getElementById('examHistogram') as HTMLCanvasElement;
+        console.log(monthNames, examCountsByMonth)
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: monthNames,
+                datasets: [{
+                    label: 'Number of Exams',
+                    data: examCountsByMonth,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    }
+
 
     /**
      * On destroy

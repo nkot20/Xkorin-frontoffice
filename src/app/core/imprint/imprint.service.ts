@@ -130,4 +130,15 @@ export class ImprintService {
             })
         )
     }
+
+    getImprintsValuesEvolutionOfPerson(personId): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.imprintPath + '/evolution/' + personId).pipe(
+            tap((response) => {
+                this._imprintsValues.next(response.imprintValue);
+                this._imprints.next(response.variableTree);
+                this._infosImprintDetailsCompany.next(response.evolution);
+                this._examDetails.next(response.examDetails);
+            })
+        )
+    }
 }

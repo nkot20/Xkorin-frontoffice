@@ -102,7 +102,6 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             tap(() => this.loadingImprints = true),
             tap(imprints => {
                 this.imprints = imprints;
-                console.log(imprints)
                 this.indexIsAvalaible = this.imprints.every(value => value.isAvailable);
                 this.loadingImprints = false;
             })
@@ -112,7 +111,6 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             tap(() => this.loadingStatistiques = true),
             tap(stats => {
                 this.imprintStats = stats;
-                console.log(stats);
                 this.renderChart(this.imprintStats);
             })
         ).subscribe({
@@ -124,7 +122,6 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             tap(() => this.loadingImprintsValue = true),
             tap(values => {
                 this.imprintsValues = values;
-                console.log('imprintvalues', values);
                 this.cci = values.reduce((sum, value) => sum + value, 0);
             })
         ).subscribe({
