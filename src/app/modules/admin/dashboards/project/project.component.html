@@ -86,49 +86,52 @@
     <!-- Main -->
     <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
         <div class="w-full max-w-screen-xl mx-auto">
-            <div class="p-4 grid grid-cols-4 gap-4" *ngIf="(exams$ | async) as exams; else loadingExams">
+            <div class="p-4 grid grid-cols-4 gap-4" >
                 <!-- Card 1: Total Assessments -->
-                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
-                        <mat-icon class="text-blue-500">arrow_upward</mat-icon>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-800">{{exams.length}}</div>
-                    <div class="text-md text-gray-600 mt-1">Total</div>
-                    <div class="text-sm text-gray-400">Assessments</div>
-                </mat-card>
-
-                <!-- Card 2: Total FCFA -->
-                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 mb-3">
-                        <mat-icon class="text-red-500">arrow_downward</mat-icon>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-800">{{totalAmount}} M</div>
-                    <div class="text-md text-gray-600 mt-1">Total</div>
-                    <div class="text-sm text-gray-400">FCFA</div>
-                </mat-card>
-
-                <!-- Card 3: Points Last -->
-                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
-                        <mat-icon class="text-blue-500">arrow_upward</mat-icon>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-800">{{lastIndex}}</div>
-                    <div class="text-md text-gray-600 mt-1">Pts</div>
-                    <div class="text-sm text-gray-400">Last</div>
-                </mat-card>
-
-                <!-- Card 4: Points Average -->
-                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
-                    <div class="flex items-center mb-3">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50">
+                <ng-template *ngIf="(exams$ | async) as exams; else loadingExams">
+                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
                             <mat-icon class="text-blue-500">arrow_upward</mat-icon>
                         </div>
-                        <span class="text-green-500 text-sm ml-1">+1.65%</span>
-                    </div>
-                    <div class="text-2xl font-bold text-gray-800">{{averageIndex}}</div>
-                    <div class="text-md text-gray-600 mt-1">Pts</div>
-                    <div class="text-sm text-gray-400">Average</div>
-                </mat-card>
+                        <div class="text-2xl font-bold text-gray-800">{{exams.length}}</div>
+                        <div class="text-md text-gray-600 mt-1">Total</div>
+                        <div class="text-sm text-gray-400">Assessments</div>
+                    </mat-card>
+
+                    <!-- Card 2: Total FCFA -->
+                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 mb-3">
+                            <mat-icon class="text-red-500">arrow_downward</mat-icon>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">{{totalAmount}} M</div>
+                        <div class="text-md text-gray-600 mt-1">Total</div>
+                        <div class="text-sm text-gray-400">FCFA</div>
+                    </mat-card>
+
+                    <!-- Card 3: Points Last -->
+                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
+                            <mat-icon class="text-blue-500">arrow_upward</mat-icon>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">{{lastIndex}}</div>
+                        <div class="text-md text-gray-600 mt-1">Pts</div>
+                        <div class="text-sm text-gray-400">Last</div>
+                    </mat-card>
+
+                    <!-- Card 4: Points Average -->
+                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
+                        <div class="flex items-center mb-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50">
+                                <mat-icon class="text-blue-500">arrow_upward</mat-icon>
+                            </div>
+                            <span class="text-green-500 text-sm ml-1">+1.65%</span>
+                        </div>
+                        <div class="text-2xl font-bold text-gray-800">{{averageIndex}}</div>
+                        <div class="text-md text-gray-600 mt-1">Pts</div>
+                        <div class="text-sm text-gray-400">Average</div>
+                    </mat-card>
+                </ng-template>
+
 
                 <!--<div class="bg-white col-span-2 shadow rounded-lg p-4 flex justify-between items-center">
                     <div>
@@ -164,70 +167,74 @@
                         <span class="text-red-500 ml-2">2 seats</span>
                     </div>
                 </div>-->
+                <ng-template *ngIf="(infosDatas$ | async) as infosDatas; else loadingInfosExam">
+                    <div class="col-span-2" >
+                        <mat-card class="p-4">
+                            <div class="font-semibold text-lg">Total Evolution</div>
+                            <!--<canvas baseChart
+                                    [datasets]="lineChartData"
+                                    [labels]="lineChartLabels"
+                                    [legend]="lineChartLegend">
+                            </canvas>-->
+                            <canvas id="examHistogram" class="w-full h-80" style="height: 480px !important;"></canvas>
+                        </mat-card>
+                    </div>
 
+                    <div class="col-span-2" >
+                        <mat-card class="p-4">
+                            <div class="font-semibold text-lg">Index Evolution</div>
+                            <!--<canvas baseChart
+                                    [datasets]="indexChartData"
+                                    [labels]="indexChartLabels"
+                                    [chartType]="'line'",
+
+                                    [legend]="indexChartLegend">
+                            </canvas>-->
+                            <canvas id="evolutionChart" class="w-full h-80" style="height: 480px !important;"></canvas>
+                        </mat-card>
+                    </div>
+                </ng-template>
                 <!-- Charts -->
-                <div class="col-span-2" >
-                    <mat-card class="p-4">
-                        <div class="font-semibold text-lg">Total Evolution</div>
-                        <!--<canvas baseChart
-                                [datasets]="lineChartData"
-                                [labels]="lineChartLabels"
-                                [legend]="lineChartLegend">
-                        </canvas>-->
-                        <canvas id="examHistogram" class="w-full h-80" style="height: 480px !important;"></canvas>
-                    </mat-card>
-                </div>
+                <ng-template #loadingInfosExam >
+                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-gray-200 animate-pulse" *ngIf="isLoadingInfosDetails">
 
-                <div class="col-span-2" >
-                    <mat-card class="p-4">
-                        <div class="font-semibold text-lg">Index Evolution</div>
-                        <!--<canvas baseChart
-                                [datasets]="indexChartData"
-                                [labels]="indexChartLabels"
-                                [chartType]="'line'",
-
-                                [legend]="indexChartLegend">
-                        </canvas>-->
-                        <canvas id="evolutionChart" class="w-full h-80" style="height: 480px !important;"></canvas>
-                    </mat-card>
-                </div>
+                    </div>
+                </ng-template>
             </div>
             <ng-template #loadingExams>
-                <div class="p-4 grid grid-cols-4 gap-4">
-                    <!-- Card 1: Total Assessments -->
-                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                        <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                        <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                        <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                    </div>
+                <!-- Card 1: Total Assessments -->
+                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
+                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
+                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+                </div>
 
-                    <!-- Card 2: Total FCFA -->
-                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                        <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                        <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                        <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                    </div>
+                <!-- Card 2: Total FCFA -->
+                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
+                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
+                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+                </div>
 
-                    <!-- Card 3: Points Last -->
-                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                        <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                        <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                        <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                    </div>
+                <!-- Card 3: Points Last -->
+                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
+                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
+                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+                </div>
 
-                    <!-- Card 4: Points Average -->
-                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
-                        <div class="flex items-center mb-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"></div>
-                            <div class="h-4 w-12 bg-gray-200 animate-pulse ml-1"></div>
-                        </div>
-                        <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                        <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                        <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+                <!-- Card 4: Points Average -->
+                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
+                    <div class="flex items-center mb-3">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"></div>
+                        <div class="h-4 w-12 bg-gray-200 animate-pulse ml-1"></div>
                     </div>
+                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
+                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
+                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
                 </div>
 
             </ng-template>

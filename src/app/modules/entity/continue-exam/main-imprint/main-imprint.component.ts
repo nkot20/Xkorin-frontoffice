@@ -19,7 +19,7 @@ import {StateService} from "../../../../core/state/state.service";
 import {ImprintComponent} from "../../exam/imprint/imprint.component";
 
 @Component({
-    selector: 'app-main-imprint',
+    selector: 'app-main-imprint-continue',
     templateUrl: './main-imprint.component.html',
     styleUrls: ['./main-imprint.component.scss'],
     standalone: true,

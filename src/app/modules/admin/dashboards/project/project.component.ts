@@ -168,11 +168,12 @@ export class ProjectComponent implements OnInit, OnDestroy
             tap( () => this.isLoading = true),
             tap(infosDetails => {
                 this.infosDetails = infosDetails;
+                console.log(infosDetails)
                 this.isLoadingInfosDetails = false;
                 infosDetails.variableTree.forEach(item => {
                     this.imprintsNames.push(item.imprint.name)
                 });
-                this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues - 1].value
+                this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues.length - 1].value
                 this.averageIndex = (this.infosDetails.evolution.indexValues.reduce((sum, item) => sum + item.value)) / this.infosDetails.evolution.indexValues.length
                 this.renderChartEvolution(this.infosDetails.evolution.indexValues, this.infosDetails.evolution.imprintsData);
 
@@ -230,9 +231,9 @@ export class ProjectComponent implements OnInit, OnDestroy
         });
 
         const ctx = document.getElementById('examHistogram') as HTMLCanvasElement;
-        console.log(monthNames, examCountsByMonth)
+        //console.log(monthNames, examCountsByMonth)
         new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: monthNames,
                 datasets: [{
