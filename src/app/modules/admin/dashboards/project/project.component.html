@@ -4,240 +4,162 @@
     <div class="bg-card">
         <div class="flex flex-col w-full max-w-screen-xl mx-auto px-6 sm:px-8">
             <div class="flex flex-col sm:flex-row flex-auto sm:items-center min-w-0 my-8 sm:my-12">
+
                 <!-- Avatar and name -->
                 <div class="flex flex-auto items-center min-w-0" *ngIf="(user$ | async) as user">
                     <div class="flex-0 w-16 h-16 rounded-full overflow-hidden">
-                        <img
-                            class="w-full h-full object-cover"
-                            src="{{user.avatar}}">
+                        <img class="w-full h-full object-cover" src="{{user.avatar || 'assets/images/avatars/img.png'}}">
                     </div>
                     <div class="flex flex-col min-w-0 ml-4">
                         <ng-container *transloco="let t">
-                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate" >{{t('welcome-back')}}, {{user.name}}!</div>
+                            <div class="text-2xl md:text-5xl font-semibold tracking-tight leading-7 md:leading-snug truncate">
+                                {{t('welcome-back')}}, {{user.name}}!
+                            </div>
                         </ng-container>
-                     <!--   <div class="flex items-center">
-                            <mat-icon
-                                class="icon-size-5"
-                                [svgIcon]="'heroicons_solid:bell'"></mat-icon>
-                            <div class="ml-1.5 leading-6 truncate text-secondary">You have 2 new messages and 15 new tasks</div>
-                        </div>-->
                     </div>
                 </div>
+
                 <!-- Actions -->
-                <div class="flex items-center mt-6 sm:mt-0 sm:ml-2 space-x-3">
-                    <button
-                        class="bg-accent"
-                        mat-flat-button
-                        [color]="'accent'">
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:envelope'"></mat-icon>
-                        <span class="ml-2">Messages</span>
-                    </button>
-                    <button
-                        mat-flat-button
-                        [color]="'primary'">
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_solid:cog-8-tooth'"></mat-icon>
-                        <span class="ml-2">Settings</span>
-                    </button>
-                </div>
+
             </div>
-            <!-- Project selector -->
-            <!--<div
-                class="relative flex self-start pt-2 pb-1 pl-5 pr-4 cursor-pointer overflow-hidden rounded-t-xl border border-b-0 bg-default"
-                matRipple
-                [matMenuTriggerFor]="projectsMenu">
-                <div class="flex items-center">
-                    <div class="overflow-hidden">
-                        <div class="font-medium leading-6 truncate">{{selectedProject}}</div>
-                    </div>
-                    <div class="flex items-center justify-center pl-2">
-                        <mat-icon
-                            class="icon-size-5"
-                            [svgIcon]="'heroicons_mini:chevron-down'"></mat-icon>
-                    </div>
-                </div>
-                <mat-menu
-                    #projectsMenu="matMenu"
-                    [xPosition]="'before'">
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='ACME Corp. Backend App'">ACME Corp. Backend App
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='ACME Corp. Frontend App'">ACME Corp. Frontend App
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='Creapond'">Creapond
-                    </button>
-                    <button
-                        mat-menu-item
-                        (click)="selectedProject='Withinpixels'">Withinpixels
-                    </button>
-                </mat-menu>
-            </div>-->
         </div>
     </div>
 
     <!-- Main -->
     <div class="flex-auto border-t -mt-px pt-4 sm:pt-6">
         <div class="w-full max-w-screen-xl mx-auto">
-            <div class="p-4 grid grid-cols-4 gap-4" >
+            <div class="p-4 grid grid-cols-4 gap-4" *ngIf="!isLoading && !isLoadingInfosDetails; else loadingExams">
+
                 <!-- Card 1: Total Assessments -->
-                <ng-template *ngIf="(exams$ | async) as exams; else loadingExams">
-                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
-                            <mat-icon class="text-blue-500">arrow_upward</mat-icon>
-                        </div>
-                        <div class="text-2xl font-bold text-gray-800">{{exams.length}}</div>
-                        <div class="text-md text-gray-600 mt-1">Total</div>
-                        <div class="text-sm text-gray-400">Assessments</div>
-                    </mat-card>
-
-                    <!-- Card 2: Total FCFA -->
-                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 mb-3">
-                            <mat-icon class="text-red-500">arrow_downward</mat-icon>
-                        </div>
-                        <div class="text-2xl font-bold text-gray-800">{{totalAmount}} M</div>
-                        <div class="text-md text-gray-600 mt-1">Total</div>
-                        <div class="text-sm text-gray-400">FCFA</div>
-                    </mat-card>
-
-                    <!-- Card 3: Points Last -->
-                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
-                            <mat-icon class="text-blue-500">arrow_upward</mat-icon>
-                        </div>
-                        <div class="text-2xl font-bold text-gray-800">{{lastIndex}}</div>
-                        <div class="text-md text-gray-600 mt-1">Pts</div>
-                        <div class="text-sm text-gray-400">Last</div>
-                    </mat-card>
-
-                    <!-- Card 4: Points Average -->
-                    <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center" >
-                        <div class="flex items-center mb-3">
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50">
-                                <mat-icon class="text-blue-500">arrow_upward</mat-icon>
-                            </div>
-                            <span class="text-green-500 text-sm ml-1">+1.65%</span>
-                        </div>
-                        <div class="text-2xl font-bold text-gray-800">{{averageIndex}}</div>
-                        <div class="text-md text-gray-600 mt-1">Pts</div>
-                        <div class="text-sm text-gray-400">Average</div>
-                    </mat-card>
-                </ng-template>
-
-
-                <!--<div class="bg-white col-span-2 shadow rounded-lg p-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-4xl font-semibold text-gray-800">333 k</div>
-                        <div class="text-sm text-gray-500">Average</div>
-                        <div class="text-xs text-gray-400">FCFA/Assessments</div>
+                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
+                        <mat-icon class="text-blue-500">arrow_upward</mat-icon>
                     </div>
-                    <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
-                        <span class="text-red-500">
-                          <mat-icon class="text-red-500">arrow_downward</mat-icon>
-                        </span>
-                    </div>
-                </div>
-
-                &lt;!&ndash; Card 6: Your Position &ndash;&gt;
-                <mat-card class="p-4 col-span-2 rounded-lg shadow-sm flex flex-col items-center">
-                    <div class="text-2xl font-bold text-gray-800">6</div>
-                    <div class="text-md text-gray-600 mt-1">Your position</div>
-                    <div class="flex items-center text-red-500">
-                        <mat-icon>arrow_downward</mat-icon>
-                        <span class="ml-1">2 seats</span>
-                    </div>
+                    <div class="text-2xl font-bold text-gray-800">{{exams.length}}</div>
+                    <div class="text-md text-gray-600 mt-1">Total</div>
+                    <div class="text-sm text-gray-400">Assessments</div>
                 </mat-card>
-                <div class="bg-white shadow rounded-lg p-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-4xl font-semibold text-gray-800">6</div>
-                        <div class="text-sm text-gray-500">Your position</div>
-                    </div>
-                    <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
-                        <span class="text-red-500">
-                          ⬇️
-                        </span>
-                        <span class="text-red-500 ml-2">2 seats</span>
-                    </div>
-                </div>-->
-                <ng-template *ngIf="(infosDatas$ | async) as infosDatas; else loadingInfosExam">
-                    <div class="col-span-2" >
-                        <mat-card class="p-4">
-                            <div class="font-semibold text-lg">Total Evolution</div>
-                            <!--<canvas baseChart
-                                    [datasets]="lineChartData"
-                                    [labels]="lineChartLabels"
-                                    [legend]="lineChartLegend">
-                            </canvas>-->
-                            <canvas id="examHistogram" class="w-full h-80" style="height: 480px !important;"></canvas>
-                        </mat-card>
-                    </div>
-
-                    <div class="col-span-2" >
-                        <mat-card class="p-4">
-                            <div class="font-semibold text-lg">Index Evolution</div>
-                            <!--<canvas baseChart
-                                    [datasets]="indexChartData"
-                                    [labels]="indexChartLabels"
-                                    [chartType]="'line'",
-
-                                    [legend]="indexChartLegend">
-                            </canvas>-->
-                            <canvas id="evolutionChart" class="w-full h-80" style="height: 480px !important;"></canvas>
-                        </mat-card>
-                    </div>
-                </ng-template>
-                <!-- Charts -->
-                <ng-template #loadingInfosExam >
-                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-gray-200 animate-pulse" *ngIf="isLoadingInfosDetails">
-
-                    </div>
-                </ng-template>
-            </div>
-            <ng-template #loadingExams>
-                <!-- Card 1: Total Assessments -->
-                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                </div>
 
                 <!-- Card 2: Total FCFA -->
-                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoading">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                </div>
+                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 mb-3">
+                        <mat-icon class="text-red-500">arrow_downward</mat-icon>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">{{totalAmount}} M</div>
+                    <div class="text-md text-gray-600 mt-1">Total</div>
+                    <div class="text-sm text-gray-400">FCFA</div>
+                </mat-card>
 
                 <!-- Card 3: Points Last -->
-                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
-                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
-                </div>
+                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 mb-3">
+                        <mat-icon class="text-blue-500">arrow_upward</mat-icon>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800">{{lastIndex}}</div>
+                    <div class="text-md text-gray-600 mt-1">Pts</div>
+                    <div class="text-sm text-gray-400">Last</div>
+                </mat-card>
 
                 <!-- Card 4: Points Average -->
-                <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse" *ngIf="isLoadingInfosDetails">
+                <mat-card class="p-4 rounded-lg shadow-sm flex flex-col items-center">
                     <div class="flex items-center mb-3">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"></div>
-                        <div class="h-4 w-12 bg-gray-200 animate-pulse ml-1"></div>
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50">
+                            <mat-icon class="text-blue-500">arrow_upward</mat-icon>
+                        </div>
+                        <!--<span class="text-green-500 text-sm ml-1">+1.65%</span>-->
                     </div>
-                    <div class="h-6 w-20 bg-gray-200 animate-pulse"></div>
-                    <div class="h-4 w-16 bg-gray-200 animate-pulse mt-1"></div>
-                    <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+                    <div class="text-2xl font-bold text-gray-800">{{averageIndex}}</div>
+                    <div class="text-md text-gray-600 mt-1">Pts</div>
+                    <div class="text-sm text-gray-400">Average</div>
+                </mat-card>
+
+                <!-- Chart 1: Total Evolution -->
+                <!-- Chart 1: Total Evolution -->
+                <div class="col-span-2">
+                    <mat-card class="p-4">
+                        <div class="font-semibold text-lg">Total Evolution</div>
+                        <apx-chart
+                            [series]="examSeries"
+                            [chart]="examChartOptions.chart"
+                            [xaxis]="examChartOptions.xaxis"
+                            [yaxis]="examChartOptions.yaxis"
+                            [stroke]="examChartOptions.stroke"
+                            [colors]="examChartOptions.colors"
+                            [dataLabels]="examChartOptions.dataLabels">
+                        </apx-chart>
+                    </mat-card>
                 </div>
 
+                <!-- Chart 2: Index Evolution -->
+                <div class="col-span-2">
+                    <mat-card class="p-4">
+                        <div class="font-semibold text-lg">Index Evolution</div>
+                        <apx-chart
+                            [series]="indexSeries"
+                            [chart]="indexChartOptions.chart"
+                            [xaxis]="indexChartOptions.xaxis"
+                            [yaxis]="indexChartOptions.yaxis"
+                            [stroke]="indexChartOptions.stroke"
+                            [colors]="indexChartOptions.colors"
+                            [dataLabels]="indexChartOptions.dataLabels">
+                        </apx-chart>
+                    </mat-card>
+                </div>
+
+
+            </div>
+
+            <!-- Loading Skeleton -->
+            <ng-template #loadingExams>
+                <div class="p-4 grid grid-cols-4 gap-4">
+                    <!-- Skeleton Card 1 -->
+                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                        <div class="h-6 w-20 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-16 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-24 bg-gray-200 mt-1"></div>
+                    </div>
+
+                    <!-- Skeleton Card 2 -->
+                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                        <div class="h-6 w-20 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-16 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-24 bg-gray-200 mt-1"></div>
+                    </div>
+
+                    <!-- Skeleton Card 3 -->
+                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 mb-3"></div>
+                        <div class="h-6 w-20 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-16 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-24 bg-gray-200 mt-1"></div>
+                    </div>
+
+                    <!-- Skeleton Card 4 -->
+                    <div class="p-4 rounded-lg shadow-sm flex flex-col items-center bg-white animate-pulse">
+                        <div class="flex items-center mb-3">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200"></div>
+                            <div class="h-4 w-12 bg-gray-200 ml-1"></div>
+                        </div>
+                        <div class="h-6 w-20 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-16 bg-gray-200 mt-1"></div>
+                        <div class="h-4 w-24 bg-gray-200 mt-1"></div>
+                    </div>
+
+                    <!-- Skeleton Chart 1 -->
+                    <div class="col-span-2 p-4 rounded-lg shadow-sm bg-white animate-pulse">
+                        <div class="h-80 w-full bg-gray-200"></div>
+                    </div>
+
+                    <!-- Skeleton Chart 2 -->
+                    <div class="col-span-2 p-4 rounded-lg shadow-sm bg-white animate-pulse">
+                        <div class="h-80 w-full bg-gray-200"></div>
+                    </div>
+                </div>
             </ng-template>
+
+
         </div>
     </div>
 

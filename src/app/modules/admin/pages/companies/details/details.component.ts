@@ -1,5 +1,5 @@
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import {Observable, BehaviorSubject, combineLatest, takeUntil, Subject} from "rxjs";
 import { tap, filter, switchMap } from 'rxjs/operators';
 import { environment } from "../../../../../../environments/environment";
 import { ImprintService } from "../../../../../core/imprint/imprint.service";
@@ -13,6 +13,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
 import { NgApexchartsModule } from "ng-apexcharts";
 import { MatTabsModule } from "@angular/material/tabs";
+import {CompanyService} from "../../../../../core/company/company.service";
 
 Chart.register(...registerables);
 
@@ -45,6 +46,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
     imprintStats: any[] = [];
     cci: number;
     imprintsNames: string[] = [];
+    companyName: string = '';
     categories = [
         {
             name: 'Personal relationship',
@@ -67,11 +69,11 @@ export class DetailsComponent implements AfterViewInit, OnInit {
 
     progress = 80;
     urlCertificat: string = environment.apiFile + '/certificats/imprints-fusion/';
-    examId: string;
-
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+    isLoading = true;
     private dataLoaded = new BehaviorSubject<boolean>(false);
 
-    constructor(private _imprintService: ImprintService, private _examService: ExamService, private cd: ChangeDetectorRef) { }
+    constructor(private _imprintService: ImprintService, private _examService: ExamService, private cd: ChangeDetectorRef, private _companyService: CompanyService) { }
 
     ngOnInit() {
         this.urlCertificat = this.urlCertificat + this._examService.idExam + ".pdf";
@@ -80,12 +82,13 @@ export class DetailsComponent implements AfterViewInit, OnInit {
         this.examDetails$ = this._imprintService.examDetails$;
         this.imprintStats$ = this._imprintService.imprintStatistics$;
 
-        this._imprintService.imprintsValues$.pipe(
-            tap(value => {
-                this.imprintsValues = value.reverse();
-                this.cci = value.reduce((sum, value) => sum + value, 0);
-            })
-        ).subscribe();
+
+        this._imprintService.imprintsValues$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe({next: (value) => {
+                    this.imprintsValues = value.reverse();
+                    this.cci = value.reduce((sum, value) => sum + value, 0);
+            }});
 
         this.imprintStats$.pipe(
             tap(value => {
@@ -96,6 +99,7 @@ export class DetailsComponent implements AfterViewInit, OnInit {
         this._imprintService.infosImprintDetailsCompany$.pipe(
             tap(value => {
                 this.infosDetailsCompany = value;
+
                 this.dataLoaded.next(true); // Déclencher l'événement une fois que les données sont chargées
             })
         ).subscribe();
