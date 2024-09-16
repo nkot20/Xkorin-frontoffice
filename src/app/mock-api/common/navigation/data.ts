@@ -8,7 +8,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         title: 'Dashboard',
         type : 'basic',
         icon : 'heroicons_outline:clipboard-document-check',
-        link : '/dashboards/project',
+        link : '/dashboards/sme',
         role : UserRoles.COMPANY_ADMIN
     },
     {
@@ -16,7 +16,7 @@ export const defaultNavigation: FuseNavigationItem[] = [
         title: 'Dashboard',
         type : 'basic',
         icon : 'heroicons_outline:clipboard-document-check',
-        link : '/dashboards/project',
+        link : '/dashboards/institution',
         role : UserRoles.INSTITUTION_ADMIN
     },
     {

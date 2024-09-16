@@ -3,12 +3,9 @@ import {DatePipe, NgFor, NgIf} from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import {Router, RouterLink} from '@angular/router';
-import { Board } from 'app/modules/admin/apps/scrumboard/scrumboard.models';
-import { ScrumboardService } from 'app/modules/admin/apps/scrumboard/scrumboard.service';
 import { DateTime } from 'luxon';
 import { Subject, takeUntil } from 'rxjs';
 import {ExamService} from "../../../../../core/exam/exam.service";
-import {Exam} from "../../../../../core/exam/exam.types";
 import {UserService} from "../../../../../core/user/user.service";
 
 @Component({

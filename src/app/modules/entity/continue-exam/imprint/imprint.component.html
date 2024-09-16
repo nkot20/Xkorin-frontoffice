@@ -26,6 +26,7 @@
                     </ng-container>
                     <tr mat-header-row *matHeaderRowDef="displayedInitialColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedInitialColumns;"></tr>
+
                 </table>
                 <div class="flex justify-end mt-8">
                     <button mat-flat-button color="primary" (click)="nextStep(stepper.selectedIndex)" [disabled]="!horizontalStepperForm.get('initialStep').valid">
