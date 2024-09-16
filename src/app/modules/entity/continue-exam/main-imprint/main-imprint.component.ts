@@ -1,4 +1,4 @@
-import {Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {ImprintService} from "../../../../core/imprint/imprint.service";
 import {UserService} from "../../../../core/user/user.service";
 import {InstitutionService} from "../../../../core/institution/institution.service";
@@ -6,7 +6,7 @@ import {UntypedFormBuilder} from "@angular/forms";
 import {ExamService} from "../../../../core/exam/exam.service";
 import {OptionService} from "../../../../core/option/option.service";
 import {ActivatedRouteSnapshot, Router, RouterLink, RouterStateSnapshot} from "@angular/router";
-import {Observable, switchMap} from "rxjs";
+import {Observable, Subject, switchMap, takeUntil} from "rxjs";
 import {User} from "../../../../core/user/user.types";
 import {AsyncPipe, NgForOf, NgIf} from "@angular/common";
 import {FuseAlertComponent} from "../../../../../@fuse/components/alert";
@@ -14,12 +14,12 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatRadioModule} from "@angular/material/radio";
-import {MatTableModule} from "@angular/material/table";
-import {ImprintComponent} from "../imprint/imprint.component";
+import {MatTableModule} from "@angular/material/table"
 import {StateService} from "../../../../core/state/state.service";
+import {ImprintComponent} from "../imprint/imprint.component";
 
 @Component({
-    selector: 'app-main-imprint',
+    selector: 'app-main-imprint-continue',
     templateUrl: './main-imprint.component.html',
     styleUrls: ['./main-imprint.component.scss'],
     standalone: true,
@@ -34,7 +34,9 @@ import {StateService} from "../../../../core/state/state.service";
         NgForOf,
         NgIf,
         ImprintComponent,
-        RouterLink
+        RouterLink,
+        ImprintComponent,
+        ImprintComponent
     ]
 })
 export class MainImprintComponent implements OnInit, OnChanges{
@@ -42,13 +44,14 @@ export class MainImprintComponent implements OnInit, OnChanges{
     data: any;
     imprints$: Observable<any[]>;
     currentImprintIndex: number = 0;
-    currentVariableIndex: number = 0;
     user$: Observable<User>;
     variableAlreadyReaded: any[] = [];
     currentVariable: any;
     currentImprintIndex$: Observable<number>;
     currentVariableIndex$: Observable<number>;
+    user: User;
 
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
         private _userService: UserService,
@@ -60,6 +63,7 @@ export class MainImprintComponent implements OnInit, OnChanges{
         private _router: Router,
         private _stateService: StateService,
         private router: Router,
+        private _changeDetectorRef: ChangeDetectorRef
     ) {
         this.currentImprintIndex$ = this._stateService.currentImprintIndex$;
         this.currentVariableIndex$ = this._stateService.currentVariableIndex$;
@@ -67,14 +71,19 @@ export class MainImprintComponent implements OnInit, OnChanges{
     }
 
     ngOnInit() {
-        if (!localStorage.getItem('exam')) {
-            this.router.navigate(['/evaluation/new']);
-        }
         this.imprints$ = this._imprintService.imprints$;
         this.user$ = this._userService.user$;
         this.updateCurrentState();
+        // Subscribe to user changes
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) =>
+            {
+                this.user = user;
 
-
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -84,12 +93,24 @@ export class MainImprintComponent implements OnInit, OnChanges{
     updateCurrentState() {
         this._stateService.currentVariableIndex$.subscribe(index => {
             this._stateService.currentImprintIndex$.subscribe(indexImprint => {
-                this.variableAlreadyReaded = this._stateService.getData()[indexImprint].variables.slice(0, this._stateService.currentVariableIndexSource$.value + 1);
-                this.currentVariable = this._stateService.getData()[indexImprint].variables[this._stateService.currentVariableIndexSource$.value];
-            })
+                const data = this._stateService.getData();
+                if (data && data[indexImprint]) {
+                    this.variableAlreadyReaded = data[indexImprint].variables.slice(0, index + 1);
+                    this.currentVariable = data[indexImprint].variables[index];
+                }
+            });
         });
     }
 
 
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
+    }
 
 }

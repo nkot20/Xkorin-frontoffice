@@ -214,21 +214,42 @@
             <div class="text-secondary">Following information is publicly displayed, be careful!</div>
         </div>
         <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
-            <!-- Name -->
-            <div class="sm:col-span-4">
-                <mat-form-field
-                    class="w-full"
-                    [subscriptSizing]="'dynamic'">
-                    <mat-label>Name</mat-label>
-                    <mat-icon
-                        class="icon-size-5"
-                        [svgIcon]="'heroicons_solid:user'"
-                        matPrefix></mat-icon>
-                    <input
-                        [formControlName]="'name'"
-                        matInput>
-                </mat-form-field>
+            <div class="sm:col-span-2">
+                <!-- logo -->
+                <div class="flex items-center mb-4">
+                    <div class="mr-3 rounded bg-gray-200 p-2">
+                        <!-- Espace pour afficher l'image -->
+                        <img [src]="imageSrc" alt="Uploaded Image" id="uploadedImage" class="img-fluid">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h6 class="mb-1">Logo</h6>
+                        <button mat-raised-button color="primary" type="button" (click)="fileInputLogo.click()">Upload</button>
+                        <input type="file" #fileInputLogo style="display: none;" (change)="onFileSelected($event)" accept="image/*">
+                        <mat-error *ngIf="accountForm.get('logo').touched && accountForm.get('logo').errors">Logo required</mat-error>
+                    </div>
+                </div>
             </div>
+
+            <div class="sm:col-span-2">
+                <div class="flex items-center mb-4">
+                    <div class="mr-3 rounded bg-gray-200 p-2">
+                        <!-- Espace pour afficher l'image -->
+                        <img [src]="signatureSrc" alt="Uploaded Signature" id="signature" class="img-fluid">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <h6 class="mb-1">Signature of company representative</h6>
+                        <button mat-raised-button color="primary" type="button" (click)="fileInputSign.click()">Upload</button>
+                        <input type="file" #fileInputSign style="display:none;" (change)="onFileSelectedToSignature($event)" >
+                        <span class="text-red-500 text-xs italic" *ngIf="accountForm.get('signature').touched && accountForm.get('signature').errors">Signature required</span>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
             <!-- Company -->
             <div class="sm:col-span-2">
                 <mat-form-field
@@ -291,7 +312,22 @@
             <div class="text-xl">Personal Information</div>
             <div class="text-secondary">Communication details in case we want to connect with you. These will be kept private.</div>
         </div>
+
         <div class="grid sm:grid-cols-4 gap-6 w-full mt-8">
+            <div class="sm:col-span-4">
+                <mat-form-field
+                    class="w-full"
+                    [subscriptSizing]="'dynamic'">
+                    <mat-label>Name</mat-label>
+                    <mat-icon
+                        class="icon-size-5"
+                        [svgIcon]="'heroicons_solid:user'"
+                        matPrefix></mat-icon>
+                    <input
+                        [formControlName]="'name'"
+                        matInput>
+                </mat-form-field>
+            </div>
             <!-- Email -->
             <div class="sm:col-span-2">
                 <mat-form-field

@@ -1,5 +1,12 @@
 import { TextFieldModule } from '@angular/cdk/text-field';
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component, ElementRef,
+    OnInit,
+    ViewChild,
+    ViewEncapsulation
+} from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatOptionModule } from '@angular/material/core';
@@ -13,6 +20,9 @@ import {async, Observable, Subject, takeUntil} from "rxjs";
 import {User} from "../../../../../core/user/user.types";
 import {ToastrService} from "ngx-toastr";
 import {UserRoles} from "../../../../../core/role/role.types";
+import {Helper} from "../../../../../core/Common/Helper";
+import SignaturePad from "signature_pad";
+import {NgxFileDropModule} from "ngx-file-drop";
 
 @Component({
     selector       : 'settings-account',
@@ -20,13 +30,16 @@ import {UserRoles} from "../../../../../core/role/role.types";
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, TextFieldModule, MatSelectModule, MatOptionModule, MatButtonModule, NgForOf, NgIf, AsyncPipe],
+    imports: [FormsModule, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatInputModule, TextFieldModule, MatSelectModule, MatOptionModule, MatButtonModule, NgForOf, NgIf, AsyncPipe, NgxFileDropModule],
 })
 export class SettingsAccountComponent implements OnInit
 {
     accountForm: UntypedFormGroup;
+    files: File[] = [];
     schoolLevel = ['Self-taugh', '1st School Living Certificate ', 'GCE O Level/ CAP', 'GCE A Level', '1st year Undergraduate', '2nd year undergraduate', '3rd year undergraduate', 'Postgraduate +1year', 'Masters', 'PhD', 'Other'];
     selectedFile: any = null;
+    signatureSrc: string;
+    imageSrc: string;
     user$: Observable<User>
     userInfos: User;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
@@ -51,6 +64,8 @@ export class SettingsAccountComponent implements OnInit
      */
     ngOnInit(): void
     {
+        //this.signaturePad = new SignaturePad(this.signatureCanvas.nativeElement);
+
         // Create the form
 
         this.user$ = this._userService.user$;
@@ -75,11 +90,15 @@ export class SettingsAccountComponent implements OnInit
                         //logo: ['']
                     });
                 } if (user.role.includes(UserRoles.INSTITUTION_ADMIN)) {
+                    this.imageSrc = user.institution.customization.logo;
+                    this.signatureSrc = user.institution.customization.signature;
                     this.accountForm = this._formBuilder.group({
                         name    : [user.name],
                         company : [user.institution.name],
                         description   : [user.institution.description],
                         email   : [user.email, Validators.email],
+                        logo   : [user.institution.customization.logo],
+                        signature   : [user.institution.customization.signature],
                         companyEmail   : [user.institution.email, Validators.email],
                         //phone   : [user.institution.mobile_no],
                         language: [user.langage],
@@ -92,11 +111,6 @@ export class SettingsAccountComponent implements OnInit
                 this._changeDetectorRef.markForCheck();
 
             });
-    }
-
-    onFileSelected(event: any): void {
-        this.selectedFile = event.target.files[0] ?? null;
-
     }
 
     onSubmit() {
@@ -127,9 +141,64 @@ export class SettingsAccountComponent implements OnInit
         })
     }
 
+    onFileSelected(event: any): void {
+        const file: File = event.target.files[0];
+        if (file) {
+            // Vérifier si le fichier est bien une image
+            if (!file.type.startsWith('image/')) {
+                console.error('Le fichier sélectionné n\'est pas une image.');
+                return;
+            }
+            Helper.uploadImage(file)
+                .then(base64Image => {
+                    this.imageSrc = base64Image;
+                    this.accountForm.patchValue({ logo: file });
+                    this.accountForm.get('logo')?.updateValueAndValidity();
+                    // Gérer la représentation en base64 de l'image selon vos besoins
+                })
+                .catch(error => {
+                    console.error('Erreur lors de l\'upload de l\'image :', error);
+                    // Gérer l'erreur
+                });
+        }
+    }
+
+    onFileSelectedToSignature(event: any): void {
+        const file: File = event.target.files[0];
+        if (file) {
+            // Vérifier si le fichier est bien une image
+            if (!file.type.startsWith('image/')) {
+                console.error('Le fichier sélectionné n\'est pas une image.');
+                return;
+            }
+            Helper.uploadImage(file)
+                .then(base64Image => {
+                    this.signatureSrc = base64Image;
+                    console.log(this.signatureSrc)
+
+                    // Gérer la représentation en base64 de l'image selon vos besoins
+                })
+                .catch(error => {
+                    console.error('Erreur lors de l\'upload de l\'image :', error);
+                    // Gérer l'erreur
+                });
+        }
+    }
+
+    public dropped(files: File[]) {
+        this.files = files;
+    }
+
+    public upload() {
+        const formData = new FormData();
+        this.files.forEach(file => formData.append('files', file));
+    }
+
+
     hasRole(role) {
         return this.userInfos.role.includes(role);
     }
+
 
     protected readonly async = async;
     protected readonly UserRoles = UserRoles;

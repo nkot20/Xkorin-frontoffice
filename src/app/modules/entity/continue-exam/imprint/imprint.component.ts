@@ -1,4 +1,14 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import {
+    Component,
+    Input,
+    OnChanges,
+    OnInit,
+    SimpleChanges,
+    ViewChildren,
+    QueryList,
+    AfterViewInit,
+    ChangeDetectorRef
+} from '@angular/core';
 import {
     FormBuilder,
     FormGroup,
@@ -7,7 +17,7 @@ import {
     UntypedFormGroup,
     Validators
 } from '@angular/forms';
-import { Observable } from 'rxjs';
+import {Observable, Subject, takeUntil} from 'rxjs';
 import { User } from '../../../../core/user/user.types';
 import { Option } from '../../../../core/option/option.types';
 import { UserService } from '../../../../core/user/user.service';
@@ -40,7 +50,7 @@ interface SurveyQuestion {
 }
 
 @Component({
-    selector: 'app-imprint',
+    selector: 'app-imprint-continue',
     templateUrl: './imprint.component.html',
     styleUrls: ['./imprint.component.scss'],
     standalone: true,
@@ -81,6 +91,10 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
 
     isLoading: boolean = false;
 
+    user: User;
+
+    private _unsubscribeAll: Subject<any> = new Subject<any>();
+
     constructor(
         private fb: FormBuilder,
         private _userService: UserService,
@@ -91,13 +105,24 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
         private _router: Router,
         private _formBuilder: UntypedFormBuilder,
         private _stateService: StateService,
-        private _answerService: AnswerService
+        private _answerService: AnswerService,
+        private _changeDetectorRef: ChangeDetectorRef
+
     ) {
         this.currentStepperIndex$ = this._stateService.currentStepperIndex$;
     }
 
     ngOnInit(): void {
-        // Vous pouvez initialiser d'autres variables si nécessaire
+        // Subscribe to user changes
+        this._userService.user$
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((user: User) =>
+            {
+                this.user = user;
+
+                // Mark for check
+                this._changeDetectorRef.markForCheck();
+            });
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -111,6 +136,13 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
             this._optionService.optionsNotImportant$.subscribe(value => {
                 this.optionsNotImportant = value;
                 this.displayedColumns = ['question'];
+                this.optionsNotImportant.sort((a,b)=> {
+                    if (a.value > b.value)
+                        return 1;
+                    else if(a.value < b.value)
+                        return -1
+                    return 0;
+                });
                 this.optionsNotImportant.forEach(option => {
                     this.displayedColumns.push(option.label);
                 });
@@ -119,9 +151,18 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
             this._optionService.optionsImportant$.subscribe(value => {
                 this.optionsImportant = value;
                 this.displayedInitialColumns = ['question'];
+                this.optionsImportant.sort((a,b)=> {
+                    if (a.value > b.value)
+                        return 1;
+                    else if(a.value < b.value)
+                        return -1
+                    return 0;
+                });
+
                 this.optionsImportant.forEach(option => {
                     this.displayedInitialColumns.push(option.label);
                 });
+
             });
 
             this.displayedColumns.push('check');
@@ -224,5 +265,15 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
 
     nextStep(currentIndex: number): void {
         this._stateService.currentStepperIndex$.next(currentIndex + 1);
+    }
+
+    /**
+     * On destroy
+     */
+    ngOnDestroy(): void
+    {
+        // Unsubscribe from all subscriptions
+        this._unsubscribeAll.next(null);
+        this._unsubscribeAll.complete();
     }
 }

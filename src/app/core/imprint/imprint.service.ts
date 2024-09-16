@@ -3,6 +3,7 @@ import {Observable, ReplaySubject, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {StateService} from "../state/state.service";
+import {CompanyService} from "../company/company.service";
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +16,13 @@ export class ImprintService {
     private _indexScore: ReplaySubject<number> = new ReplaySubject<number>();
     private _imprintStatistics: ReplaySubject<any[]> = new ReplaySubject<any[]>();
     private _imprintsValues: ReplaySubject<any[]> = new ReplaySubject<any[]>();
-    private _infosImprintDetailsCompany: ReplaySubject<any[]> = new ReplaySubject<any[]>();
+    private _infosImprintDetailsCompanyAssessment: ReplaySubject<any[]> = new ReplaySubject<any[]>();
     private _examDetails: ReplaySubject<any> = new ReplaySubject<any>();
+
     /**
      * Constructor
      */
-    constructor(private _httpClient: HttpClient, private _stateService: StateService)
+    constructor(private _httpClient: HttpClient, private _stateService: StateService, private _companyService: CompanyService)
     {
     }
 
@@ -42,11 +44,11 @@ export class ImprintService {
 
 
     get infosImprintDetailsCompany$(): ReplaySubject<any[]> {
-        return this._infosImprintDetailsCompany;
+        return this._infosImprintDetailsCompanyAssessment;
     }
 
     set infosImprintDetailsCompany$(value: ReplaySubject<any[]>) {
-        this._infosImprintDetailsCompany = value;
+        this._infosImprintDetailsCompanyAssessment = value;
     }
 
 
@@ -61,8 +63,9 @@ export class ImprintService {
     getImprintsWithVariables(profilId, subcategoryId, isoCode): Observable<any[]> {
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/variable-questions/' + profilId + '/' +subcategoryId + '/' + isoCode).pipe(
             tap((response: any) => {
-                let data = [response.reverse()[0]];
-                this._stateService.setData(data);
+
+                this._stateService.setData(response);
+
                 this._imprints.next(response);
             }),
         );
@@ -84,10 +87,10 @@ export class ImprintService {
     }
 
     getRemainingVariablesForImprints(profilId, subcategoryId, isoCode, examId) {
+        console.log(profilId, subcategoryId)
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/remaining-variables/' + profilId + '/' +subcategoryId + '/' + isoCode + '/' + examId).pipe(
             tap((response: any) => {
-                let data = [response.reverse()[0]];
-                this._stateService.setData(data);
+                this._stateService.setData(response);
                 this._imprints.next(response);
             }),
         );
@@ -125,7 +128,19 @@ export class ImprintService {
             tap((response) => {
                 this._imprintsValues.next(response.imprintValue);
                 this._imprints.next(response.variableTree);
-                this._infosImprintDetailsCompany.next(response.evolution);
+                this._infosImprintDetailsCompanyAssessment.next(response.evolution);
+                this._examDetails.next(response.examDetails);
+                this._companyService.companies.next(response.company)
+            })
+        )
+    }
+
+    getImprintsValuesEvolutionOfPerson(personId): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.imprintPath + '/evolution/' + personId).pipe(
+            tap((response) => {
+                this._imprintsValues.next(response.imprintValue);
+                this._imprints.next(response.variableTree);
+                this._infosImprintDetailsCompanyAssessment.next(response.evolution);
                 this._examDetails.next(response.examDetails);
             })
         )

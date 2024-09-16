@@ -192,7 +192,7 @@ export class ListComponent implements AfterViewInit {
         });
     }
 
-    deleteSelectedProgram(): void {
+    archivedSelectedProgram(): void {
         const confirmation = this._fuseConfirmationService.open({
             title: 'Archived program',
             message: 'Are you sure you want to archived this program? This action cannot be undone!',

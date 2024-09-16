@@ -65,6 +65,22 @@ export class ExamService {
         )
     }
 
+    getAllExams(): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.pathExam  + '/all/exams').pipe(
+            tap((response) => {
+                this._examDetails.next(response);
 
+            })
+        )
+    }
+
+    getAllExamsByInstitutionId(institutionId): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.pathExam  + '/all/' + institutionId).pipe(
+            tap((response) => {
+                this._examDetails.next(response);
+
+            })
+        )
+    }
 
 }

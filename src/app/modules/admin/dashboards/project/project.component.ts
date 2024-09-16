@@ -1,5 +1,12 @@
-import { CurrencyPipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {AsyncPipe, CurrencyPipe, NgClass, NgFor, NgIf} from '@angular/common';
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewEncapsulation
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatRippleModule } from '@angular/material/core';
@@ -11,27 +18,49 @@ import { Router } from '@angular/router';
 import { TranslocoModule } from '@ngneat/transloco';
 import { ProjectService } from 'app/modules/admin/dashboards/project/project.service';
 import { ApexOptions, NgApexchartsModule } from 'ng-apexcharts';
-import { Subject, takeUntil } from 'rxjs';
+import {Observable, Subject, takeUntil, tap} from 'rxjs';
+import {UserService} from "../../../../core/user/user.service";
+import {MatCardModule} from "@angular/material/card";
+import {ExamService} from "../../../../core/exam/exam.service";
+import {ImprintService} from "../../../../core/imprint/imprint.service";
+import {Chart, registerables} from "chart.js";
+import {User} from "../../../../core/user/user.types";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {FormsModule} from "@angular/forms";
+import {MatInputModule} from "@angular/material/input";
+import {MatSelectModule} from "@angular/material/select";
+
+Chart.register(...registerables);
 
 @Component({
     selector       : 'project',
     templateUrl    : './project.component.html',
+    styleUrls      : ['./project.component.scss'],
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports        : [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe],
+    imports: [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe, AsyncPipe, MatCardModule, MatCheckboxModule, FormsModule, MatInputModule, MatSelectModule],
 })
 export class ProjectComponent implements OnInit, OnDestroy
 {
-    chartGithubIssues: ApexOptions = {};
-    chartTaskDistribution: ApexOptions = {};
-    chartBudgetDistribution: ApexOptions = {};
-    chartWeeklyExpenses: ApexOptions = {};
-    chartMonthlyExpenses: ApexOptions = {};
-    chartYearlyExpenses: ApexOptions = {};
     data: any;
-    selectedProject: string = 'ACME Corp. Backend App';
+    infosDetails: any;
     private _unsubscribeAll: Subject<any> = new Subject<any>();
+    user$: Observable<any>;
+    user: User;
+    exams: any[];
+    isLoading = true;
+    isLoadingInfosDetails = true;
+    totalAmount: number = 0;
+    imprintsNames: string[] = [];
+    lastIndex: number = 0;
+    averageIndex: number = 0;
+    examSeries: any[];
+    examChartOptions: ApexOptions;
+    indexSeries: any[];
+    indexChartOptions: ApexOptions;
+    displayedSeries: any[]; // Séries à afficher
+    selectedSeries: any[] = []; // Séries sélectionnées
 
     /**
      * Constructor
@@ -39,6 +68,10 @@ export class ProjectComponent implements OnInit, OnDestroy
     constructor(
         private _projectService: ProjectService,
         private _router: Router,
+        private _userService: UserService,
+        private _examService: ExamService,
+        private _imprintService: ImprintService,
+        private cdr: ChangeDetectorRef
     )
     {
     }
@@ -47,401 +80,128 @@ export class ProjectComponent implements OnInit, OnDestroy
     // @ Lifecycle hooks
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * On init
-     */
     ngOnInit(): void
     {
-        // Get the data
-        this._projectService.data$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((data) =>
-            {
-                // Store the data
-                this.data = data;
+        // Charger les données des examens et empreintes
+        this.user$ = this._userService.user$;
+        this.user = this._userService.userValue;
 
-                // Prepare the chart data
-                this._prepareChartData();
+        const personId = this._userService.userValue.person._id;
+
+        // Récupérer les examens
+        this._examService.getPersonExam(personId)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((exams: any) => {
+                this.exams = exams;
+                this.totalAmount = exams.reduce((sum, item) => sum + item.exam.amount, 0);
+                this.isLoading = false;
+                this.cdr.detectChanges();
+                this.renderChartAssessmentEvolution(exams);
             });
 
-        // Attach SVG fill fixer to all ApexCharts
-        window['Apex'] = {
-            chart: {
-                events: {
-                    mounted: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                    updated: (chart: any, options?: any): void =>
-                    {
-                        this._fixSvgFill(chart.el);
-                    },
-                },
+        // Récupérer les empreintes
+        this._imprintService.getImprintsValuesEvolutionOfPerson(personId)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((infosDetails: any) => {
+                this.infosDetails = infosDetails;
+                this.isLoadingInfosDetails = false;
+                infosDetails.variableTree.forEach(item => {
+                    this.imprintsNames.push(item.imprint.name);
+                });
+                this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues.length - 1].value;
+                this.averageIndex = this.infosDetails.evolution.indexValues.reduce((sum, item) => sum + item.value, 0) / (this.infosDetails.evolution.indexValues.length || 1);
+                this.renderChartEvolution(this.infosDetails.evolution.indexValues, this.infosDetails.evolution.imprintsData);
+                this.cdr.detectChanges();
+            });
+    }
+
+    // Méthode pour afficher l'évolution de l'index
+    renderChartEvolution(index: any[], imprintsData: any[]) {
+        const labels = index.map(data => data.date);
+        const indexValues = index.map(data => data.value);
+
+        this.indexSeries = [
+            {
+                name: 'Index',
+                data: indexValues
             },
+            ...imprintsData.map((imprintData, idx) => ({
+                name: this.imprintsNames[idx],
+                data: imprintData.map(data => data.value)
+            }))
+        ];
+
+        this.selectedSeries = this.indexSeries.map(serie => serie.name); // Sélectionner toutes les séries par défaut
+        this.updateDisplayedSeries(); // Mettre à jour les séries affichées
+
+        this.indexChartOptions = {
+            chart: {
+                type: 'line',
+                height: 480
+            },
+            xaxis: {
+                categories: labels
+            },
+            yaxis: {
+                min: 0
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            colors: ['#0000ff', '#ff0000', '#00ff00', '#ffa500', '#800080'],
+            dataLabels: {
+                enabled: true
+            }
         };
     }
 
-    /**
-     * On destroy
-     */
+    // Méthode pour afficher les examens
+    renderChartAssessmentEvolution(exams: any[]) {
+        const examCountsByMonth = Array(12).fill(0);
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        exams.forEach(item => {
+            const date = new Date(item.exam.createdAt);
+            const month = date.getMonth();
+            examCountsByMonth[month]++;
+        });
+
+        this.examSeries = [
+            {
+                name: 'Number of Exams',
+                data: examCountsByMonth
+            }
+        ];
+
+        this.examChartOptions = {
+            chart: {
+                type: 'line',
+                height: 480
+            },
+            xaxis: {
+                categories: monthNames
+            },
+            yaxis: {
+                min: 0
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            colors: ['#4bc0c0'],
+            dataLabels: {
+                enabled: true
+            }
+        };
+    }
+
+    // Méthode pour mettre à jour les séries affichées
+    updateDisplayedSeries() {
+        this.displayedSeries = this.indexSeries.filter(serie => this.selectedSeries.includes(serie.name));
+    }
+
     ngOnDestroy(): void
     {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
-    trackByFn(index: number, item: any): any
-    {
-        return item.id || index;
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Fix the SVG fill references. This fix must be applied to all ApexCharts
-     * charts in order to fix 'black color on gradient fills on certain browsers'
-     * issue caused by the '<base>' tag.
-     *
-     * Fix based on https://gist.github.com/Kamshak/c84cdc175209d1a30f711abd6a81d472
-     *
-     * @param element
-     * @private
-     */
-    private _fixSvgFill(element: Element): void
-    {
-        // Current URL
-        const currentURL = this._router.url;
-
-        // 1. Find all elements with 'fill' attribute within the element
-        // 2. Filter out the ones that doesn't have cross reference so we only left with the ones that use the 'url(#id)' syntax
-        // 3. Insert the 'currentURL' at the front of the 'fill' attribute value
-        Array.from(element.querySelectorAll('*[fill]'))
-            .filter(el => el.getAttribute('fill').indexOf('url(') !== -1)
-            .forEach((el) =>
-            {
-                const attrVal = el.getAttribute('fill');
-                el.setAttribute('fill', `url(${currentURL}${attrVal.slice(attrVal.indexOf('#'))}`);
-            });
-    }
-
-    /**
-     * Prepare the chart data from the data
-     *
-     * @private
-     */
-    private _prepareChartData(): void
-    {
-        // Github issues
-        this.chartGithubIssues = {
-            chart      : {
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'line',
-                toolbar   : {
-                    show: false,
-                },
-                zoom      : {
-                    enabled: false,
-                },
-            },
-            colors     : ['#64748B', '#94A3B8'],
-            dataLabels : {
-                enabled        : true,
-                enabledOnSeries: [0],
-                background     : {
-                    borderWidth: 0,
-                },
-            },
-            grid       : {
-                borderColor: 'var(--fuse-border)',
-            },
-            labels     : this.data.githubIssues.labels,
-            legend     : {
-                show: false,
-            },
-            plotOptions: {
-                bar: {
-                    columnWidth: '50%',
-                },
-            },
-            series     : this.data.githubIssues.series,
-            states     : {
-                hover: {
-                    filter: {
-                        type : 'darken',
-                        value: 0.75,
-                    },
-                },
-            },
-            stroke     : {
-                width: [3, 0],
-            },
-            tooltip    : {
-                followCursor: true,
-                theme       : 'dark',
-            },
-            xaxis      : {
-                axisBorder: {
-                    show: false,
-                },
-                axisTicks : {
-                    color: 'var(--fuse-border)',
-                },
-                labels    : {
-                    style: {
-                        colors: 'var(--fuse-text-secondary)',
-                    },
-                },
-                tooltip   : {
-                    enabled: false,
-                },
-            },
-            yaxis      : {
-                labels: {
-                    offsetX: -16,
-                    style  : {
-                        colors: 'var(--fuse-text-secondary)',
-                    },
-                },
-            },
-        };
-
-        // Task distribution
-        this.chartTaskDistribution = {
-            chart      : {
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'polarArea',
-                toolbar   : {
-                    show: false,
-                },
-                zoom      : {
-                    enabled: false,
-                },
-            },
-            labels     : this.data.taskDistribution.labels,
-            legend     : {
-                position: 'bottom',
-            },
-            plotOptions: {
-                polarArea: {
-                    spokes: {
-                        connectorColors: 'var(--fuse-border)',
-                    },
-                    rings : {
-                        strokeColor: 'var(--fuse-border)',
-                    },
-                },
-            },
-            series     : this.data.taskDistribution.series,
-            states     : {
-                hover: {
-                    filter: {
-                        type : 'darken',
-                        value: 0.75,
-                    },
-                },
-            },
-            stroke     : {
-                width: 2,
-            },
-            theme      : {
-                monochrome: {
-                    enabled       : true,
-                    color         : '#93C5FD',
-                    shadeIntensity: 0.75,
-                    shadeTo       : 'dark',
-                },
-            },
-            tooltip    : {
-                followCursor: true,
-                theme       : 'dark',
-            },
-            yaxis      : {
-                labels: {
-                    style: {
-                        colors: 'var(--fuse-text-secondary)',
-                    },
-                },
-            },
-        };
-
-        // Budget distribution
-        this.chartBudgetDistribution = {
-            chart      : {
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'radar',
-                sparkline : {
-                    enabled: true,
-                },
-            },
-            colors     : ['#818CF8'],
-            dataLabels : {
-                enabled   : true,
-                formatter : (val: number): string | number => `${val}%`,
-                textAnchor: 'start',
-                style     : {
-                    fontSize  : '13px',
-                    fontWeight: 500,
-                },
-                background: {
-                    borderWidth: 0,
-                    padding    : 4,
-                },
-                offsetY   : -15,
-            },
-            markers    : {
-                strokeColors: '#818CF8',
-                strokeWidth : 4,
-            },
-            plotOptions: {
-                radar: {
-                    polygons: {
-                        strokeColors   : 'var(--fuse-border)',
-                        connectorColors: 'var(--fuse-border)',
-                    },
-                },
-            },
-            series     : this.data.budgetDistribution.series,
-            stroke     : {
-                width: 2,
-            },
-            tooltip    : {
-                theme: 'dark',
-                y    : {
-                    formatter: (val: number): string => `${val}%`,
-                },
-            },
-            xaxis      : {
-                labels    : {
-                    show : true,
-                    style: {
-                        fontSize  : '12px',
-                        fontWeight: '500',
-                    },
-                },
-                categories: this.data.budgetDistribution.categories,
-            },
-            yaxis      : {
-                max       : (max: number): number => parseInt((max + 10).toFixed(0), 10),
-                tickAmount: 7,
-            },
-        };
-
-        // Weekly expenses
-        this.chartWeeklyExpenses = {
-            chart  : {
-                animations: {
-                    enabled: false,
-                },
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'line',
-                sparkline : {
-                    enabled: true,
-                },
-            },
-            colors : ['#22D3EE'],
-            series : this.data.weeklyExpenses.series,
-            stroke : {
-                curve: 'smooth',
-            },
-            tooltip: {
-                theme: 'dark',
-            },
-            xaxis  : {
-                type      : 'category',
-                categories: this.data.weeklyExpenses.labels,
-            },
-            yaxis  : {
-                labels: {
-                    formatter: (val): string => `$${val}`,
-                },
-            },
-        };
-
-        // Monthly expenses
-        this.chartMonthlyExpenses = {
-            chart  : {
-                animations: {
-                    enabled: false,
-                },
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'line',
-                sparkline : {
-                    enabled: true,
-                },
-            },
-            colors : ['#4ADE80'],
-            series : this.data.monthlyExpenses.series,
-            stroke : {
-                curve: 'smooth',
-            },
-            tooltip: {
-                theme: 'dark',
-            },
-            xaxis  : {
-                type      : 'category',
-                categories: this.data.monthlyExpenses.labels,
-            },
-            yaxis  : {
-                labels: {
-                    formatter: (val): string => `$${val}`,
-                },
-            },
-        };
-
-        // Yearly expenses
-        this.chartYearlyExpenses = {
-            chart  : {
-                animations: {
-                    enabled: false,
-                },
-                fontFamily: 'inherit',
-                foreColor : 'inherit',
-                height    : '100%',
-                type      : 'line',
-                sparkline : {
-                    enabled: true,
-                },
-            },
-            colors : ['#FB7185'],
-            series : this.data.yearlyExpenses.series,
-            stroke : {
-                curve: 'smooth',
-            },
-            tooltip: {
-                theme: 'dark',
-            },
-            xaxis  : {
-                type      : 'category',
-                categories: this.data.yearlyExpenses.labels,
-            },
-            yaxis  : {
-                labels: {
-                    formatter: (val): string => `$${val}`,
-                },
-            },
-        };
     }
 }

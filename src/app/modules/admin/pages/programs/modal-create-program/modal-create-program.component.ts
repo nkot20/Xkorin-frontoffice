@@ -16,6 +16,7 @@ import {MatOptionModule} from "@angular/material/core";
 import {MatSelectModule} from "@angular/material/select";
 import {ProgramService} from "../../../../../core/program/program.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ImprintService} from "../../../../../core/imprint/imprint.service";
 
 @Component({
   selector: 'app-modal-create-program',
@@ -44,12 +45,14 @@ export class ModalCreateProgramComponent implements OnInit{
         private _toastService: ToastrService,
         private _userService: UserService,
         private _institutionService: InstitutionService,
-        private _programService: ProgramService
+        private _programService: ProgramService,
+        private _imprintService: ImprintService,
 
     ) {
     }
 
     ngOnInit() {
+        //this._imprintService.get
         this.institutionId = localStorage.getItem('%institution%');
         this._institutionService.institutions$.subscribe(value => {
             this.institutions = value.filter(item => item._id !== this.institutionId);
