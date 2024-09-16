@@ -25,6 +25,10 @@ import {ExamService} from "../../../../core/exam/exam.service";
 import {ImprintService} from "../../../../core/imprint/imprint.service";
 import {Chart, registerables} from "chart.js";
 import {User} from "../../../../core/user/user.types";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {FormsModule} from "@angular/forms";
+import {MatInputModule} from "@angular/material/input";
+import {MatSelectModule} from "@angular/material/select";
 
 Chart.register(...registerables);
 
@@ -35,7 +39,7 @@ Chart.register(...registerables);
     encapsulation  : ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone     : true,
-    imports: [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe, AsyncPipe, MatCardModule],
+    imports: [TranslocoModule, MatIconModule, MatButtonModule, MatRippleModule, MatMenuModule, MatTabsModule, MatButtonToggleModule, NgApexchartsModule, NgFor, NgIf, MatTableModule, NgClass, CurrencyPipe, AsyncPipe, MatCardModule, MatCheckboxModule, FormsModule, MatInputModule, MatSelectModule],
 })
 export class ProjectComponent implements OnInit, OnDestroy
 {
@@ -53,9 +57,10 @@ export class ProjectComponent implements OnInit, OnDestroy
     averageIndex: number = 0;
     examSeries: any[];
     examChartOptions: ApexOptions;
-    // Private
     indexSeries: any[];
     indexChartOptions: ApexOptions;
+    displayedSeries: any[]; // Séries à afficher
+    selectedSeries: any[] = []; // Séries sélectionnées
 
     /**
      * Constructor
@@ -75,52 +80,42 @@ export class ProjectComponent implements OnInit, OnDestroy
     // @ Lifecycle hooks
     // -----------------------------------------------------------------------------------------------------
 
-    /**
-     * On init
-     */
     ngOnInit(): void
     {
-        // Get the data
-        this._projectService.data$
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe((data) =>
-            {
-                // Store the data
-                this.data = data;
-
-            });
-
+        // Charger les données des examens et empreintes
         this.user$ = this._userService.user$;
         this.user = this._userService.userValue;
 
         const personId = this._userService.userValue.person._id;
-        // Get the boards
-       this._examService.getPersonExam(personId)
-            .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe({next: (exams: any) => {
-                    this.exams = exams;
-                    this.totalAmount = exams.reduce((sum, item) => sum + item.exam.amount, 0)
-                    this.isLoading = false; // Stop showing the loader
-                    this.cdr.detectChanges();
-                    this.renderChartAssessmentEvolution(exams);
-            }});
 
+        // Récupérer les examens
+        this._examService.getPersonExam(personId)
+            .pipe(takeUntil(this._unsubscribeAll))
+            .subscribe((exams: any) => {
+                this.exams = exams;
+                this.totalAmount = exams.reduce((sum, item) => sum + item.exam.amount, 0);
+                this.isLoading = false;
+                this.cdr.detectChanges();
+                this.renderChartAssessmentEvolution(exams);
+            });
+
+        // Récupérer les empreintes
         this._imprintService.getImprintsValuesEvolutionOfPerson(personId)
             .pipe(takeUntil(this._unsubscribeAll))
-            .subscribe({next: (infosDetails: any) => {
-                    this.infosDetails = infosDetails;
-                    this.isLoadingInfosDetails = false;
-                    infosDetails.variableTree.forEach(item => {
-                        this.imprintsNames.push(item.imprint.name)
-                    });
-                    this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues.length - 1].value
-                    this.averageIndex = (this.infosDetails.evolution.indexValues.reduce((sum, item) => sum + item.value, 0)) / (this.infosDetails.evolution.indexValues.length === 0 ? 1: this.infosDetails.evolution.indexValues.length)
-                    this.renderChartEvolution(this.infosDetails.evolution.indexValues, this.infosDetails.evolution.imprintsData);
-                    this.cdr.detectChanges();
-                }})
-
+            .subscribe((infosDetails: any) => {
+                this.infosDetails = infosDetails;
+                this.isLoadingInfosDetails = false;
+                infosDetails.variableTree.forEach(item => {
+                    this.imprintsNames.push(item.imprint.name);
+                });
+                this.lastIndex = this.infosDetails.evolution.indexValues[this.infosDetails.evolution.indexValues.length - 1].value;
+                this.averageIndex = this.infosDetails.evolution.indexValues.reduce((sum, item) => sum + item.value, 0) / (this.infosDetails.evolution.indexValues.length || 1);
+                this.renderChartEvolution(this.infosDetails.evolution.indexValues, this.infosDetails.evolution.imprintsData);
+                this.cdr.detectChanges();
+            });
     }
 
+    // Méthode pour afficher l'évolution de l'index
     renderChartEvolution(index: any[], imprintsData: any[]) {
         const labels = index.map(data => data.date);
         const indexValues = index.map(data => data.value);
@@ -135,6 +130,9 @@ export class ProjectComponent implements OnInit, OnDestroy
                 data: imprintData.map(data => data.value)
             }))
         ];
+
+        this.selectedSeries = this.indexSeries.map(serie => serie.name); // Sélectionner toutes les séries par défaut
+        this.updateDisplayedSeries(); // Mettre à jour les séries affichées
 
         this.indexChartOptions = {
             chart: {
@@ -157,6 +155,7 @@ export class ProjectComponent implements OnInit, OnDestroy
         };
     }
 
+    // Méthode pour afficher les examens
     renderChartAssessmentEvolution(exams: any[]) {
         const examCountsByMonth = Array(12).fill(0);
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -195,47 +194,14 @@ export class ProjectComponent implements OnInit, OnDestroy
         };
     }
 
+    // Méthode pour mettre à jour les séries affichées
+    updateDisplayedSeries() {
+        this.displayedSeries = this.indexSeries.filter(serie => this.selectedSeries.includes(serie.name));
+    }
 
-    /**
-     * On destroy
-     */
     ngOnDestroy(): void
     {
-        // Unsubscribe from all subscriptions
         this._unsubscribeAll.next(null);
         this._unsubscribeAll.complete();
     }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Public methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Track by function for ngFor loops
-     *
-     * @param index
-     * @param item
-     */
-    trackByFn(index: number, item: any): any
-    {
-        return item.id || index;
-    }
-
-    // -----------------------------------------------------------------------------------------------------
-    // @ Private methods
-    // -----------------------------------------------------------------------------------------------------
-
-    /**
-     * Fix the SVG fill references. This fix must be applied to all ApexCharts
-     * charts in order to fix 'black color on gradient fills on certain browsers'
-     * issue caused by the '<base>' tag.
-     *
-     * Fix based on https://gist.github.com/Kamshak/c84cdc175209d1a30f711abd6a81d472
-     *
-     * @param element
-     * @private
-     */
-
-
-
 }

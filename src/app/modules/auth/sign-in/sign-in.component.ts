@@ -89,16 +89,18 @@ export class AuthSignInComponent implements OnInit
                 {
                     if (this.hasRole(value.user.role, 5) && !value.user.alreadyLogin) {
                         this._router.navigate(['/more-infos'])
-                    } else {
+                    } else if (this.hasRole(value.user.role, 3) || this.hasRole(value.user.role, 4)) {
 
                         // Set the redirect url.
                         // The '/signed-in-redirect' is a dummy url to catch the request and redirect the user
                         // to the correct page after a successful sign in. This way, that url can be set via
                         // routing file and we don't have to touch here.
-                        const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
+                        //const redirectURL = this._activatedRoute.snapshot.queryParamMap.get('redirectURL') || '/signed-in-redirect';
 
                         // Navigate to the redirect url
-                        this._router.navigateByUrl(redirectURL);
+                        this._router.navigate(['/dashboards/sme']);
+                    } else if (this.hasRole(value.user.role, 5) || this.hasRole(value.user.role, 6)) {
+                        this._router.navigate(['/dashboards/institution']);
                     }
 
 

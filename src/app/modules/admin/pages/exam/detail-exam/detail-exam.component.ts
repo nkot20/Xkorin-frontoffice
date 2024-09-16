@@ -15,6 +15,10 @@ import { environment } from "../../../../../../environments/environment";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { ApexChart, ApexXAxis, ApexYAxis, ChartComponent } from 'ng-apexcharts';
 import {UserService} from "../../../../../core/user/user.service";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatOptionModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
+import {MatCardModule} from "@angular/material/card";
 
 @Component({
     selector: 'app-detail-exam',
@@ -32,7 +36,11 @@ import {UserService} from "../../../../../core/user/user.service";
         MatMenuModule,
         NgApexchartsModule,
         MatTabsModule,
-        RouterLink
+        RouterLink,
+        MatFormFieldModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatCardModule
     ]
 })
 export class DetailExamComponent implements AfterViewInit, OnInit {
@@ -69,7 +77,10 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     loadingImprintsValue = true;
     loadingStatistiques = true;
     indexIsAvalaible = false;
-    companyName = ''
+    companyName = '';
+    displayedSeries: any[]; // Séries à afficher
+    selectedSeries: any[] = []; // Séries sélectionnées
+    indexSeries: any[] =[];
 
     constructor(
         private _imprintService: ImprintService,
@@ -81,12 +92,10 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     ) {}
 
     ngOnInit() {
-        const id = this.route.snapshot.paramMap.get('id');
-        this.urlCertificat = this.urlCertificat + id + ".pdf";
-        this.examId = id
+        this.examId = this.route.snapshot.paramMap.get('id');
+        this.urlCertificat = this.urlCertificat + this.examId + ".pdf";
         this.companyName = this._userService.userValue.company.name;
         this.urlCertificat = `${this._examService.idExam}.pdf`;
-        this.examId = this._examService.idExam;
 
         this._imprintService.getStatistics()
             .pipe(takeUntil(this._unsubscribeAll))
@@ -96,14 +105,14 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
 
             }})
 
-        this._examService.getExamById(id)
+        this._examService.getExamById(this.examId)
             .pipe(takeUntil(this._unsubscribeAll))
             .subscribe({next: (exam: any) => {
                     this.examDetails = exam;
                     this.loadingExam = false;
             }});
 
-        this.imprints$ = this._imprintService.getImprintsByExam(id)
+        this.imprints$ = this._imprintService.getImprintsByExam(this.examId)
             .pipe(
             tap(() => this.loadingImprints = true),
             tap(imprints => {
@@ -115,7 +124,7 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
 
 
 
-        this.imprintsValues$ = this._imprintService.getImprintsValues(id).pipe(
+        this.imprintsValues$ = this._imprintService.getImprintsValues(this.examId).pipe(
             tap(() => this.loadingImprintsValue = true),
             tap(values => {
                 this.imprintsValues = values;
@@ -145,6 +154,26 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
             max.push(value.maxValue);
             moy.push(value.averageValue);
         });
+        this.indexSeries = [
+            {
+                name: 'Min',
+                data: min
+            },
+            {
+                name: 'Moy',
+                data: moy
+            },
+            {
+                name: 'Max',
+                data: max
+            },
+            {
+                name: 'Current',
+                data: this.imprintsValues
+            }
+        ];
+        this.selectedSeries = this.indexSeries.map(serie => serie.name); // Sélectionner toutes les séries par défaut
+        this.updateDisplayedSeries(); // Mettre à jour les séries affichées
         this.chartOptions = {
             series: [
                 {
@@ -182,6 +211,13 @@ export class DetailExamComponent implements AfterViewInit, OnInit {
     }
 
     completedAssessment() {
+        console.log(this.examId)
         this.router.navigate(['/assessment/complete/' + this.examId]);
     }
+
+    // Méthode pour mettre à jour les séries affichées
+    updateDisplayedSeries() {
+        this.displayedSeries = this.indexSeries.filter(serie => this.selectedSeries.includes(serie.name));
+    }
+
 }

@@ -94,8 +94,18 @@
                 <div class="col-span-2">
                     <mat-card class="p-4">
                         <div class="font-semibold text-lg">Index Evolution</div>
+
+                        <!-- Options to select which lines to show -->
+                        <mat-form-field appearance="fill" class="w-full mt-2">
+                            <mat-label>Select a curve(s)</mat-label>
+                            <mat-select [(value)]="selectedSeries" multiple (selectionChange)="updateDisplayedSeries()">
+                                <mat-option *ngFor="let serie of indexSeries" [value]="serie.name">{{ serie.name }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <!-- Graph -->
                         <apx-chart
-                            [series]="indexSeries"
+                            [series]="displayedSeries"
                             [chart]="indexChartOptions.chart"
                             [xaxis]="indexChartOptions.xaxis"
                             [yaxis]="indexChartOptions.yaxis"

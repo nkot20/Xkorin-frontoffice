@@ -4,16 +4,20 @@ import { tap, filter, switchMap } from 'rxjs/operators';
 import { environment } from "../../../../../../environments/environment";
 import { ImprintService } from "../../../../../core/imprint/imprint.service";
 import { ExamService } from "../../../../../core/exam/exam.service";
-import { Chart, registerables } from "chart.js";
+import {Chart, ChartOptions, registerables} from "chart.js";
 import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { CommonModule, NgClass, NgForOf } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatIconModule } from "@angular/material/icon";
 import { MatMenuModule } from "@angular/material/menu";
-import { NgApexchartsModule } from "ng-apexcharts";
+import {ApexOptions, NgApexchartsModule} from "ng-apexcharts";
 import { MatTabsModule } from "@angular/material/tabs";
 import {CompanyService} from "../../../../../core/company/company.service";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatOptionModule} from "@angular/material/core";
+import {MatSelectModule} from "@angular/material/select";
+import {MatCardModule} from "@angular/material/card";
 
 Chart.register(...registerables);
 
@@ -32,7 +36,11 @@ Chart.register(...registerables);
         MatIconModule,
         MatMenuModule,
         NgApexchartsModule,
-        MatTabsModule
+        MatTabsModule,
+        MatFormFieldModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatCardModule
     ]
 })
 export class DetailsComponent implements AfterViewInit, OnInit {
@@ -72,6 +80,14 @@ export class DetailsComponent implements AfterViewInit, OnInit {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
     isLoading = true;
     private dataLoaded = new BehaviorSubject<boolean>(false);
+    public chartOptions: ApexOptions;
+    public chartOptionsEvolution: ApexOptions;
+    displayedSeries: any[];
+    indexSeries: any[];
+    selectedSeries: any[];
+    displayedSeriesEvolution: any[];
+    indexSeriesEvolution: any[];
+    selectedSeriesEvolution: any[];
 
     constructor(private _imprintService: ImprintService, private _examService: ExamService, private cd: ChangeDetectorRef, private _companyService: CompanyService) { }
 
@@ -124,12 +140,11 @@ export class DetailsComponent implements AfterViewInit, OnInit {
     }
 
     renderChart(datas: any[]) {
-        const ctx = document.getElementById('assessmentChart') as HTMLCanvasElement;
-        let min = [];
-        let max = [];
-        let moy = [];
-        let current = [];
+        let min: number[] = [];
+        let max: number[] = [];
+        let moy: number[] = [];
         let labels: string[] = [];
+
         datas.forEach(value => {
             labels.push(value.imprint);
             min.push(value.minValue);
@@ -137,106 +152,90 @@ export class DetailsComponent implements AfterViewInit, OnInit {
             moy.push(value.averageValue);
         });
         this.imprintsNames = labels;
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Min',
-                        data: min,
-                        borderColor: 'red',
-                        fill: false,
-                    },
-                    {
-                        label: 'Moy',
-                        data: moy,
-                        borderColor: 'black',
-                        borderDash: [5, 5],
-                        fill: false,
-                    },
-                    {
-                        label: 'Max',
-                        data: max,
-                        borderColor: 'green',
-                        fill: false,
-                    },
-                    {
-                        label: 'Current',
-                        data: this.imprintsValues,
-                        borderColor: 'orange',
-                        pointRadius: 5,
-                        pointBackgroundColor: 'orange',
-                        fill: false,
-                    }
-                ]
+        let series = [
+            {
+                name: "Min",
+                data: min
             },
-            options: {
-                responsive: true,
-                /*animations: {
-                    tension: {
-                        duration: 1000,
-                        easing: 'linear',
-                        from: 1,
-                        to: 0,
-                        loop: true
-                    }
-                },*/
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+            {
+                name: "Moy",
+                data: moy
+            },
+            {
+                name: "Max",
+                data: max
+            },
+            {
+                name: "Current",
+                data: this.imprintsValues
             }
-        });
+        ];
+        this.indexSeries = series;
+        this.selectedSeries = this.indexSeries.map(serie => serie.name);
+        this.updateDisplayedSeries();
+        this.chartOptions = {
+            series: series,
+            chart: {
+                height: 350,
+                type: "line"
+            },
+            xaxis: {
+                categories: labels
+            },
+            yaxis: {
+                min: 0
+            },
+            title: {
+                text: "Imprint Assessments"
+            }
+        };
+        console.log(this.chartOptions)
     }
 
     renderChartEvolution(index: any[], imprintsData: any[]) {
-        const ctx = document.getElementById('evolutionChart') as HTMLCanvasElement;
         const labels = index.map(data => data.date);
         const indexValues = index.map(data => data.value);
-        const datasets = [{
-            label: 'Index',
-            data: indexValues,
-            borderColor: 'blue',
-            fill: false,
-        },];
+        const series = [{
+            name: "Index",
+            data: indexValues
+        }];
+        const colors = ['#FF4560', '#00E396', '#008FFB', '#FEB019', '#775DD0'];
 
-        const colors = ['red', 'green', 'orange', 'purple', 'brown'];
-
-        imprintsData.forEach((imprintData, index) => {
+        imprintsData.forEach((imprintData, i) => {
             const imprintValues = imprintData.map(data => data.value);
-            datasets.push({
-                label: this.imprintsNames[index],
-                data: imprintValues,
-                borderColor: colors[index % colors.length],
-                fill: false,
+            series.push({
+                name: this.imprintsNames[i],
+                data: imprintValues
             });
         });
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: datasets,
+        this.indexSeriesEvolution = series;
+        this.selectedSeriesEvolution = this.indexSeriesEvolution.map(serie => serie.name);
+        this.updateDisplayedSeriesEvolution();
+        this.chartOptionsEvolution = {
+            series: series,
+            chart: {
+                type: "line",
+                height: 350
             },
-            options: {
-                responsive: true,
-                /*animations: {
-                    tension: {
-                        duration: 1000,
-                        easing: 'linear',
-                        from: 1,
-                        to: 0,
-                        loop: true
-                    }
-                },*/
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
+            xaxis: {
+                categories: labels
+            },
+            yaxis: {
+                min: 0
+            },
+            colors: colors,
+            title: {
+                text: "Index and imprint evolution"
             }
-        });
+        };
+    }
+
+    updateDisplayedSeries() {
+        this.displayedSeries = this.indexSeries.filter(serie => this.selectedSeries.includes(serie.name));
+    }
+
+    updateDisplayedSeriesEvolution() {
+        this.displayedSeriesEvolution = this.indexSeriesEvolution.filter(serie => this.selectedSeriesEvolution.includes(serie.name));
     }
 
     toArray(value) {

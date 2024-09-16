@@ -111,6 +111,13 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
             this._optionService.optionsNotImportant$.subscribe(value => {
                 this.optionsNotImportant = value;
                 this.displayedColumns = ['question'];
+                this.optionsNotImportant.sort((a,b)=> {
+                    if (a.value > b.value)
+                        return 1;
+                    else if(a.value < b.value)
+                        return -1
+                    return 0;
+                });
                 this.optionsNotImportant.forEach(option => {
                     this.displayedColumns.push(option.label);
                 });
@@ -119,6 +126,13 @@ export class ImprintComponent implements OnInit, OnChanges, AfterViewInit {
             this._optionService.optionsImportant$.subscribe(value => {
                 this.optionsImportant = value;
                 this.displayedInitialColumns = ['question'];
+                this.optionsImportant.sort((a,b)=> {
+                    if (a.value > b.value)
+                        return 1;
+                    else if(a.value < b.value)
+                        return -1
+                    return 0;
+                });
                 this.optionsImportant.forEach(option => {
                     this.displayedInitialColumns.push(option.label);
                 });

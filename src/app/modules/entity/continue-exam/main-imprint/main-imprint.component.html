@@ -10,7 +10,7 @@
         <div class="flex items-center space-x-3" *ngIf="(user$ | async) as user">
             <mat-icon svgIcon="heroicons_outline:language"></mat-icon>
             <span class="text-sm">{{ user.name }}</span>
-            <img src="{{ user.avatar || 'assets/images/avatars/brian-hughes.jpg' }}" alt="Profile Picture" class="w-8 h-8 rounded-full">
+            <img src="{{ user.avatar || 'assets/images/avatars/img.png' }}" alt="Profile Picture" class="w-8 h-8 rounded-full">
         </div>
     </div>
 
@@ -39,7 +39,7 @@
                 <h2 class="text-xl font-bold">{{ currentVariable.variable.name }}</h2>
             </div>
 
-            <app-imprint [variable]="currentVariable"></app-imprint>
+            <app-imprint-continue [variable]="currentVariable"></app-imprint-continue>
         </div>
     </div>
 </div>

@@ -54,15 +54,42 @@
         </div>
 
         <!-- Graphique -->
-        <div class="w-full md:w-2/3 flex items-center justify-center min-w-0 bg-card shadow rounded-2xl overflow-hidden p-8">
-            <canvas id="assessmentChart" class="w-full h-80"></canvas>
-        </div>
+        <mat-card  class="w-full md:w-2/3 rounded-2xl p-8">
+            <mat-form-field appearance="fill" class="w-full mt-2">
+                <mat-label>Select a curve(s)</mat-label>
+                <mat-select [(value)]="selectedSeries" multiple (selectionChange)="updateDisplayedSeries()">
+                    <mat-option *ngFor="let serie of indexSeries" [value]="serie.name">{{ serie.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <apx-chart *ngIf="chartOptions"
+                       class="w-full"
+                [series]="displayedSeries"
+                [chart]="chartOptions.chart"
+                [xaxis]="chartOptions.xaxis"
+                [yaxis]="chartOptions.yaxis"
+                [title]="chartOptions.title">
+            </apx-chart>
+        </mat-card >
     </div>
     <div class="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 p-4" *ngIf="(examDetails$ | async) as examDetails">
 
-        <div class="w-full md:w-3/3 flex items-center justify-center min-w-0 bg-card shadow rounded-2xl overflow-hidden p-8">
-            <canvas id="evolutionChart" class="w-full h-80" style="height: 480px !important;"></canvas>
-        </div>
+        <mat-card  class="w-full md:w-3/3 rounded-2xl p-8">
+            <mat-form-field appearance="fill" class="w-full mt-2">
+                <mat-label>Select a curve(s)</mat-label>
+                <mat-select [(value)]="selectedSeriesEvolution" multiple (selectionChange)="updateDisplayedSeriesEvolution()">
+                    <mat-option *ngFor="let serie of indexSeriesEvolution" [value]="serie.name">{{ serie.name }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <apx-chart
+                *ngIf="chartOptionsEvolution"
+                class="w-full h-80"
+                [series]="displayedSeriesEvolution"
+                [chart]="chartOptionsEvolution.chart"
+                [xaxis]="chartOptionsEvolution.xaxis"
+                [yaxis]="chartOptionsEvolution.yaxis"
+                [title]="chartOptionsEvolution.title">
+            </apx-chart>
+        </mat-card >
     </div>
 
     <div class="gap-6 w-full min-w-0 bg-card shadow rounded-2xl overflow-hidden" *ngIf="(imprints$ | async) as imprints">

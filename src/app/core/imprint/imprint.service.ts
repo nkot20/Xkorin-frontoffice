@@ -87,6 +87,7 @@ export class ImprintService {
     }
 
     getRemainingVariablesForImprints(profilId, subcategoryId, isoCode, examId) {
+        console.log(profilId, subcategoryId)
         return this._httpClient.get<any[]>(environment.api + this.imprintPath + '/remaining-variables/' + profilId + '/' +subcategoryId + '/' + isoCode + '/' + examId).pipe(
             tap((response: any) => {
                 this._stateService.setData(response);
