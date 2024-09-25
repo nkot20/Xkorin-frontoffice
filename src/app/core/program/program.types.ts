@@ -5,4 +5,13 @@ export interface Program {
     targetInstitutionId?: string;
     targetName?: string;
     archived?: boolean;
+    code?: string;
+    targetInstitution?: targetInstitution;
+    numberOfParticipants?: number;
+    amount?: number
+}
+
+export interface  targetInstitution {
+    _id?: string;
+    name?: string;
 }

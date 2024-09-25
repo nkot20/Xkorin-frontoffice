@@ -37,6 +37,7 @@ export class ModalCreateProgramComponent implements OnInit{
     loading = false;
     institutions: Institution[];
     user$: Observable<User>;
+    imprints: any[];
     userValue: User;
 
     constructor(
@@ -52,19 +53,26 @@ export class ModalCreateProgramComponent implements OnInit{
     }
 
     ngOnInit() {
-        //this._imprintService.get
         this.institutionId = localStorage.getItem('%institution%');
         this._institutionService.institutions$.subscribe(value => {
             this.institutions = value.filter(item => item._id !== this.institutionId);
         });
+        this._imprintService.imprints$.subscribe(value => {
+            this.imprints = value;
+        });
         this.user$ = this._userService.user$;
+
         this.programForm = this._formBuilder.group({
             name: ['', Validators.required],
             targetInstitutionId: ['', Validators.required],
+            imprintIds: [[], Validators.required],
+            maxParticipants: [null, [Validators.required, Validators.min(1)]],      // New field
+            allocatedAmount: [null, [Validators.required, Validators.min(0)]]        // New field
         });
+
         this._userService.user$.subscribe(value => {
             this.userValue = value;
-        })
+        });
     }
 
     onNoClick(): void {
@@ -78,7 +86,10 @@ export class ModalCreateProgramComponent implements OnInit{
         let payload = {
             name: this.programForm.value['name'],
             targetInstitutionId: this.programForm.value['targetInstitutionId'],
-            institutionId: this.userValue.institution._id
+            institutionId: this.userValue.institution._id,
+            amount: this.programForm.value['allocatedAmount'],
+            numberOfParticipants: this.programForm.value['maxParticipants'],
+            imprintIds: this.programForm.value['imprintIds'],
         }
         this._programService.createProgram(payload).subscribe(value => {
             this._toastService.success("Program added successfully", "Create program");

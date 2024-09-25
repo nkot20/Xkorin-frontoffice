@@ -1,0 +1,178 @@
+
+
+<div class="sm:absolute sm:inset-0 flex flex-col flex-auto min-w-0 sm:overflow-hidden bg-card dark:bg-transparent">
+
+
+    <div class="header-section p-6 bg-white shadow-lg rounded-lg border border-gray-200">
+        <div *ngIf="(program$ | async) as program">
+            <h3 class="mb-4 text-2xl font-bold text-gray-800">Program Details</h3>
+
+            <!-- Code -->
+            <div class="flex items-center justify-start mb-2">
+                <mat-icon class="text-gray-500 mr-2" svgIcon="heroicons_outline:tag"></mat-icon> <!-- Updated icon -->
+                <h4 class="w-48 text-md font-semibold text-gray-700">Code:</h4>
+                <span class="text-gray-600">{{ program.code }}</span>
+            </div>
+
+            <!-- Name -->
+            <div class="flex items-center justify-start mb-2">
+                <mat-icon class="text-gray-500 mr-2" svgIcon="heroicons_outline:document-text"></mat-icon>
+                <h4 class="w-48 text-md font-semibold text-gray-700">Name:</h4>
+                <span class="text-gray-600">{{ program.name }}</span>
+            </div>
+
+            <!-- Number of participants -->
+            <div class="flex items-center justify-start mb-2">
+                <mat-icon class="text-gray-500 mr-2" svgIcon="heroicons_outline:user-group"></mat-icon>
+                <h4 class="w-48 text-md font-semibold text-gray-700">Number of participants:</h4>
+                <span class="text-gray-600">{{ program.numberOfParticipants }}</span>
+            </div>
+
+            <!-- Amount -->
+            <div class="flex items-center justify-start mb-2">
+                <mat-icon class="text-gray-500 mr-2" svgIcon="heroicons_outline:currency-dollar"></mat-icon>
+                <h4 class="w-48 text-md font-semibold text-gray-700">Amount:</h4>
+                <span class="text-gray-600">{{ program.amount | currency:'XAF':'symbol':'1.0-0' }} </span>
+            </div>
+
+            <!-- Status -->
+            <div class="flex items-center justify-start mb-2">
+                <mat-icon class="text-gray-500 mr-2" *ngIf="program.archived" svgIcon="heroicons_outline:x-circle"></mat-icon> <!-- Updated icon for Archived -->
+                <mat-icon class="text-green-500 mr-2" *ngIf="!program.archived" svgIcon="heroicons_outline:check"></mat-icon> <!-- Updated icon for Active -->
+                <h4 class="w-48 text-md font-semibold text-gray-700">Status:</h4>
+                <span class="text-gray-600">{{ program.archived ? 'Archived' : 'Active' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="relative flex flex-col sm:flex-row flex-0 sm:items-center sm:justify-between py-8 px-6 md:px-8 border-b">
+
+        <div class="flex shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Search -->
+            <mat-form-field
+                class="fuse-mat-dense fuse-mat-rounded min-w-64"
+                [subscriptSizing]="'dynamic'">
+                <mat-icon
+                    class="icon-size-5"
+                    matPrefix
+                    [svgIcon]="'heroicons_solid:magnifying-glass'"></mat-icon>
+                <input
+                    matInput
+                    [formControl]="searchInputControl"
+                    [autocomplete]="'off'"
+                    [placeholder]="'Search programs'">
+            </mat-form-field>
+            <!-- Add suggestion button -->
+
+        </div>
+    </div>
+
+
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+
+        <!-- Suggestion list -->
+        <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
+            <ng-container *ngIf="(participants$ | async) as participants">
+                <ng-container *ngIf="participants.length > 0; else noParticipants">
+                    <div class="grid">
+
+                        <!-- Header -->
+                        <div class="program-grid z-10 sticky top-0 grid gap-5 py-4 px-6 md:px-8 shadow text-md font-semibold text-secondary bg-gray-50 dark:bg-black dark:bg-opacity-5"
+                             matSort
+                             matSortDisableClear>
+                            <div
+                                class="hidden sm:block"
+                                [mat-sort-header]="'name'">
+                                Name
+                            </div>
+                            <div [mat-sort-header]="'email'" class="hidden sm:block">
+                                email
+                            </div>
+                            <div
+                                class="hidden sm:block"
+                                [mat-sort-header]="'phone'">
+                                Phone number
+                            </div>
+                            <div
+                                class="hidden sm:block"
+                                [mat-sort-header]="'phone'">
+                                Gender
+                            </div>
+                            <div
+                                class="hidden lg:block"
+                                [mat-sort-header]="'Company'">
+                                Company
+                            </div>
+                            <div class="hidden sm:block">
+                                Details
+                            </div>
+                        </div>
+
+                        <!-- Rows -->
+                        <ng-container *ngFor="let item of participants; trackBy: trackByFn">
+                            <div class="program-grid grid items-center gap-5 py-3 px-6 md:px-8 border-b">
+                                <!-- ID -->
+                                <div class="hidden md:block w-10">
+                                    {{item.participant.name}}
+                                </div>
+
+                                <!-- Title -->
+                                <div class="hidden md:block truncate">
+                                    {{item.participant.email}}
+                                </div>
+
+                                <!-- Description -->
+                                <div class="hidden md:block truncate">
+                                    {{item.participant.mobile_no}}
+                                </div>
+
+                                <div class="hidden md:block truncate">
+                                    {{item.participant.gender}}
+                                </div>
+                                <div class="hidden md:block truncate">
+                                    {{item.company.name}}
+                                </div>
+
+                                <!-- Details Button -->
+                                <div>
+                                    <a
+                                        class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                        mat-stroked-button
+                                        [routerLink]="['details/'+item.participant._id]">
+                                        <mat-icon
+                                            class="icon-size-5"
+                                            [svgIcon]="'heroicons_solid:eye'"></mat-icon>
+
+                                    </a>
+
+                                </div>
+                            </div>
+
+                        </ng-container>
+                    </div>
+                </ng-container>
+
+                <mat-paginator
+                    class="border-b sm:border-t sm:border-b-0 z-10 bg-gray-50 dark:bg-transparent"
+                    [ngClass]="{'pointer-events-none': isLoading}"
+                    [length]="pagination.totalDocs"
+                    [pageIndex]="pagination.page"
+                    [pageSize]="pagination.limit"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    [showFirstLastButtons]="true"></mat-paginator>
+            </ng-container>
+            <ng-template #noParticipants>
+                <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
+                    <mat-icon
+                        class="icon-size-24"
+                        [svgIcon]="'heroicons_outline:academic-cap'"></mat-icon>
+                    <div class="mt-6 text-2xl font-semibold tracking-tight text-secondary">No participants found!</div>
+                </div>
+            </ng-template>
+
+        </div>
+    </div>
+</div>

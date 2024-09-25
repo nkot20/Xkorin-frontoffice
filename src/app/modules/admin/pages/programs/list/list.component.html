@@ -44,8 +44,8 @@
 
         <!-- Suggestion list -->
         <div class="flex flex-col flex-auto sm:mb-18 overflow-hidden sm:overflow-y-auto">
-            <ng-container *ngIf="(programs$ | async) as suggestions">
-                <ng-container *ngIf="suggestions.length > 0; else noSuggestions">
+            <ng-container *ngIf="(programs$ | async) as programs">
+                <ng-container *ngIf="programs.length > 0; else noPrograms">
                     <div class="grid">
 
                         <!-- Header -->
@@ -54,8 +54,8 @@
                              matSortDisableClear>
                             <div
                                 class="hidden sm:block"
-                                [mat-sort-header]="'id'">
-                                ID
+                                [mat-sort-header]="'code'">
+                                Code
                             </div>
                             <div [mat-sort-header]="'name'" class="hidden sm:block">
                                 Title
@@ -80,8 +80,8 @@
                             <ng-container *ngFor="let program of programs; trackBy: trackByFn">
                                 <div class="program-grid grid items-center gap-5 py-3 px-6 md:px-8 border-b">
                                     <!-- ID -->
-                                    <div class="hidden md:block truncate">
-                                        {{program._id}}
+                                    <div class="hidden md:block w-10">
+                                        {{program.code}}
                                     </div>
 
                                     <!-- Title -->
@@ -91,8 +91,9 @@
 
                                     <!-- Description -->
                                     <div class="hidden md:block truncate">
-                                        {{program.targetName}}
+                                        {{program.targetInstitution.name}}
                                     </div>
+
 
                                     <!-- Status -->
                                     <div class="hidden md:block truncate">
@@ -119,6 +120,16 @@
                                                 [svgIcon]="selectedProgram?._id === program._id ? 'heroicons_solid:chevron-up' : 'heroicons_solid:chevron-down'">
                                             </mat-icon>
                                         </button>
+
+                                        <a
+                                            [routerLink]="[program._id]"
+                                            class="min-w-10 min-h-7 h-7 mx-2 px-2 leading-6"
+                                            mat-stroked-button>
+                                            <mat-icon
+                                                class="icon-size-5"
+                                                [svgIcon]="'heroicons_solid:eye'">
+                                            </mat-icon>
+                                        </a>
                                     </div>
                                 </div>
                                 <div class="grid">
@@ -243,7 +254,7 @@
                 </div>
             </ng-template>
 
-            <ng-template #noSuggestions>
+            <ng-template #noPrograms>
                 <div class="flex flex-auto flex-col items-center justify-center bg-gray-100 dark:bg-transparent">
                     <mat-icon
                         class="icon-size-24"
