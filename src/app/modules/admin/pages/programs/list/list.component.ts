@@ -76,7 +76,6 @@ export class ListComponent implements AfterViewInit {
     private _unsubscribeAll: Subject<any> = new Subject<any>();
 
     constructor(
-        private _activatedRoute: ActivatedRoute,
         private _changeDetectorRef: ChangeDetectorRef,
         private _router: Router,
         private _programsService: ProgramService,

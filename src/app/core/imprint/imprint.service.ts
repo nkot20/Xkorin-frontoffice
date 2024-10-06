@@ -123,6 +123,15 @@ export class ImprintService {
         )
     }
 
+    getImprints(): Observable<any> {
+        return this._httpClient.get<any>(environment.api + this.imprintPath  + '/list').pipe(
+            tap((response) => {
+                this._imprints.next(response);
+
+            })
+        )
+    }
+
     getImprintsValuesDetailsCompanies(institutionId, personId): Observable<any> {
         return this._httpClient.get<any>(environment.api + this.imprintPath + '/'  + institutionId + '/evolution/' + personId).pipe(
             tap((response) => {
