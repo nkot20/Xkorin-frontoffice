@@ -1,30 +1,58 @@
-
 <form [formGroup]="programForm" class="" *ngIf="(user$ | async) as user" (ngSubmit)="onSubmit()">
     <h2 mat-dialog-title>Add a new program</h2>
     <mat-dialog-content>
 
-            <mat-form-field appearance="fill" class="w-full">
-                <mat-label>Program name</mat-label>
-                <input matInput placeholder="Business name" id="programName" [formControlName]="'name'">
-                <mat-error *ngIf="programForm.get('name').invalid && programForm.get('name').touched">Program name required</mat-error>
-            </mat-form-field>
-            <mat-form-field class="w-full">
-                <mat-label>Target institution</mat-label>
-                <mat-select [formControlName]="'targetInstitutionId'">
-                    <mat-option *ngFor="let institution of institutions" value="{{institution._id}}">{{institution.name}}</mat-option>
-                    <mat-option value="Nothing">Nothing</mat-option>
-                </mat-select>
-                <mat-error *ngIf="programForm.get('targetInstitutionId').hasError('required')">
-                    Institution is required
-                </mat-error>
+        <!-- Program name field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Program name</mat-label>
+            <input matInput placeholder="Business name" id="programName" [formControlName]="'name'">
+            <mat-error *ngIf="programForm.get('name').invalid && programForm.get('name').touched">Program name required</mat-error>
+        </mat-form-field>
 
-            </mat-form-field>
+        <!-- Target institution field -->
+        <mat-form-field class="w-full">
+            <mat-label>Target institution</mat-label>
+            <mat-select [formControlName]="'targetInstitutionId'">
+                <mat-option *ngFor="let institution of institutions" [value]="institution._id">{{institution.name}}</mat-option>
+                <mat-option value="Nothing">Nothing</mat-option>
+            </mat-select>
+            <mat-error *ngIf="programForm.get('targetInstitutionId').hasError('required')">
+                Institution is required
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Multi-select for imprints -->
+        <mat-form-field class="w-full">
+            <mat-label>Select Imprints</mat-label>
+            <mat-select [formControlName]="'imprintIds'" multiple>
+                <mat-option *ngFor="let imprint of imprints" [value]="imprint._id">{{imprint.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+
+        <!-- Maximum number of participants -->
+        <mat-form-field class="w-full">
+            <mat-label>Maximum number of participants</mat-label>
+            <input matInput type="number" placeholder="Enter maximum number of participants" [formControlName]="'maxParticipants'">
+            <mat-error *ngIf="programForm.get('maxParticipants').invalid && programForm.get('maxParticipants').touched">
+                Maximum number of participants is required
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Allocated amount -->
+        <mat-form-field class="w-full">
+            <mat-label>Allocated amount</mat-label>
+            <input matInput type="number" placeholder="Enter allocated amount" [formControlName]="'allocatedAmount'">
+            <mat-error *ngIf="programForm.get('allocatedAmount').invalid && programForm.get('allocatedAmount').touched">
+                Allocated amount is required
+            </mat-error>
+        </mat-form-field>
 
     </mat-dialog-content>
+
     <mat-dialog-actions>
         <button mat-button (click)="onNoClick()">Close</button>
-        <button mat-flat-button
-                [color]="'primary'"  type="submit" cdkFocusInitial>Submit</button>
+        <button mat-flat-button [color]="'primary'" type="submit" cdkFocusInitial>Submit</button>
     </mat-dialog-actions>
 
 </form>

@@ -81,7 +81,8 @@ export class ExamComponent implements OnInit {
                 institution  : ['', Validators.required],
                 program  : ['', Validators.required],
                 aim          : ['', [Validators.required]],
-                amount       : [50000],
+                amount       : [Validators.required],
+                code         : ['', Validators.required]
             },
         );
     }

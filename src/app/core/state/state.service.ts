@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import {BehaviorSubject} from "rxjs";
 
 @Injectable({
@@ -14,6 +15,10 @@ export class StateService {
     currentVariableIndex$ = this.currentVariableIndexSource.asObservable();
 
     private data: any[] = []; // Remplir avec les données d'empreintes
+
+    constructor(private router: Router) {
+
+    }
 
     setData(data: any[]): void {
         this.data = data;
@@ -47,12 +52,13 @@ export class StateService {
 
     nextImprint() {
         let currentImprintIndex = this.currentImprintIndexSource.value;
-        console.log("Current imprint ",currentImprintIndex);
         if (currentImprintIndex < this.data.length - 1) {
             currentImprintIndex++;
             this.currentImprintIndexSource.next(currentImprintIndex);
             this.currentVariableIndexSource.next(0);
         }
+        if (currentImprintIndex == this.data.length - 1)
+            this.router.navigate(['assessment'])
     }
 
     resetStepperIndex(): void {

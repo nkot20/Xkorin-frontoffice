@@ -13,7 +13,9 @@ export class ProgramService {
     pathProgram = '/program'
 
     private _programs: ReplaySubject<Program[]> = new ReplaySubject<Program[]>();
+    private _program: ReplaySubject<Program> = new ReplaySubject<Program>();
     private _pagination: BehaviorSubject<any> = new BehaviorSubject(null);
+    private _participants: ReplaySubject<any[]> = new ReplaySubject<any[]>();
 
     /**
      * Constructor
@@ -24,6 +26,14 @@ export class ProgramService {
 
     get programs$(): Observable<Program[]> {
         return this._programs.asObservable();
+    }
+
+    get program$(): Observable<Program> {
+        return this._program.asObservable();
+    }
+
+    get participants$(): Observable<any[]> {
+        return this._participants.asObservable();
     }
 
     get pagination$(): BehaviorSubject<any> {
@@ -80,6 +90,32 @@ export class ProgramService {
     }
 
     getProgramDetails(id): Observable<Program> {
-        return this._httpClient.get<Program>(environment.api + this.pathProgram + '/details/' + id);
+        return this._httpClient.get<Program>(environment.api + this.pathProgram + '/details/' + id).pipe(
+            tap((response: any) => {
+                this._program.next(response);
+            }),
+        );
+    }
+
+    getProgramDetailsWithParticipants(id): Observable<Program> {
+        return this._httpClient.get<Program>(environment.api + this.pathProgram + '/details-participants/' + id);
+    }
+
+    getProgramsParticipants(page: number = 0, size: number = 10, sort: string = 'creation_date', order: 'asc' | 'desc' | '' = 'asc', search: string = '', programId): Observable<any[]> {
+        return this._httpClient.get<any[]>(environment.api + this.pathProgram + '/participants/list/' + programId, {
+            params: {
+                page: page,
+                limit: size,
+                sort,
+                order,
+                search,
+            }
+        }).pipe(
+            tap((response: any) => {
+                console.log(response)
+                this._participants.next(response.participants);
+                this._pagination.next(response.pagination);
+            }),
+        );
     }
 }

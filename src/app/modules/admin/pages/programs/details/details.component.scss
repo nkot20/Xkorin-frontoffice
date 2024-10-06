@@ -1,0 +1,104 @@
+/* program-details.component.css */
+.program-details {
+    display: flex;
+    align-items: center;
+}
+
+.program-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.program-info h2, .program-info p {
+    margin: 0;
+}
+
+.skeleton-header, .skeleton-subheader, .skeleton-row {
+    background-color: #e0e0e0;
+    height: 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-header {
+    width: 200px;
+    height: 30px;
+}
+
+.skeleton-subheader {
+    width: 150px;
+}
+
+.skeleton-row {
+    height: 40px;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+}
+
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.header-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.header-section h3 {
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.user-list-section {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.user-list-section h4 {
+    margin-bottom: 20px;
+}
+
+.user-list-section table {
+    width: 100%;
+}
+
+.user-list-section img {
+    border-radius: 50%;
+}
+
+.footer-section {
+    margin-top: 50px;
+}
+
+.footer-section p {
+    margin-bottom: 0;
+    font-size: 14px;
+    color: #6c757d;
+}

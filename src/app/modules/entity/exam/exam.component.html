@@ -93,7 +93,18 @@
 
                             </mat-select>
                             <mat-error *ngIf="examForm.get('program').hasError('required')">
-                                Institution is required
+                                Program is required
+                            </mat-error>
+
+                        </mat-form-field>
+                        <mat-form-field class="w-full" *ngIf="selectedOptionInstitution">
+                            <mat-label>Code</mat-label>
+                            <input
+                                id="code"
+                                matInput
+                                type="text" [formControlName]="'code'">
+                            <mat-error *ngIf="examForm.get('code').hasError('required')">
+                                code is required
                             </mat-error>
 
                         </mat-form-field>
